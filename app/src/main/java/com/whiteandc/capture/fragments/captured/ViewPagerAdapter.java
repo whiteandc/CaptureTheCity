@@ -1,4 +1,4 @@
-package com.whiteandc.capture.adapters;
+package com.whiteandc.capture.fragments.captured;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;

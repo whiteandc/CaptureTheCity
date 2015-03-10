@@ -1,4 +1,4 @@
-package com.whiteandc.capture.adapters;
+package com.whiteandc.capture.fragments.list;
 
 import android.app.Activity;
 import android.graphics.Typeface;

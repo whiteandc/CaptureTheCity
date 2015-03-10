@@ -1,31 +1,23 @@
 package com.whiteandc.capture;
 
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.whiteandc.capture.adapters.SectionsPagerAdapter;
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
-import com.whiteandc.capture.fragments.FragmentCamera;
-import com.whiteandc.capture.fragments.FragmentMonument;
+import com.whiteandc.capture.fragments.camera.FragmentCamera;
+import com.whiteandc.capture.fragments.list.FragmentCityList;
+import com.whiteandc.capture.fragments.notcaptured.FragmentNotCaptured;
 
-public class MonumentsActivity extends ActionBarActivity implements OnPageChangeListener {
+public class MonumentsActivity extends ActionBarActivity{
 
     private Toolbar toolbar;
-	private SectionsPagerAdapter mSectionsPagerAdapter;
-	private ViewPager mViewPager;
-	
-	private String currentMonumentId = null;
-	public FragmentCamera fragmentCamera= new FragmentCamera();
-
-	public FragmentMonument fragmentMonument= new FragmentMonument();
-
+    private String currentMonumentId = null;
 	private int currentImage = 0;
 
     @Override
@@ -33,18 +25,9 @@ public class MonumentsActivity extends ActionBarActivity implements OnPageChange
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_monuments);
 
-        toolbar = (Toolbar) findViewById(R.id.app_bar);
-        toolbar.getMenu().clear();
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
+        toolbarCreation();
 
-		// Set up the ViewPager with the sections adapter.
-		mViewPager = (ViewPager) findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-		//TODO chanchullo arreglar
-        mViewPager.setOnPageChangeListener(mSectionsPagerAdapter.fragmentMonument);
-        mViewPager.setOnPageChangeListener(new PageListener(this));
+        switchToFragmentCityList();
 
         MonumentLoader.loadMonuments(getPreferences(MODE_PRIVATE));
 		if(MonumentList.getList().size()>0){
@@ -53,14 +36,36 @@ public class MonumentsActivity extends ActionBarActivity implements OnPageChange
 
 	}
 
-    public void enableHomeButton(){
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    private void toolbarCreation() {
+        toolbar = (Toolbar) findViewById(R.id.app_bar);
+        toolbar.getMenu().clear();
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
-    public void disableHomeButton(){
-        getSupportActionBar().setHomeButtonEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    private void setHomeButtonVisibility(boolean visibility){
+        getSupportActionBar().setHomeButtonEnabled(visibility);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(visibility);
+    }
+
+    public void switchToFragmentCityList(){
+        setHomeButtonVisibility(false);
+        switchFragment(new FragmentCityList());
+    }
+
+    public void switchToFragmentNotCaptured() {
+        setHomeButtonVisibility(true);
+        switchFragment(new FragmentNotCaptured());
+    }
+
+    public void switchToFragmentCamera() {
+        switchFragment(new FragmentCamera());
+    }
+
+    private void switchFragment(Fragment fragment) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_placeholder, fragment);
+        ft.commit();
     }
 
 	@Override
@@ -74,50 +79,17 @@ public class MonumentsActivity extends ActionBarActivity implements OnPageChange
 		int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            mViewPager.setCurrentItem(0);
+            switchToFragmentCityList();
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-	public void changeToFragmentMonument() {
-		mViewPager.setCurrentItem(SectionsPagerAdapter.MONUMENT);
-	}
-
-	@Override
-	public void onPageScrollStateChanged(int arg0) {}
-
-	@Override
-	public void onPageScrolled(int arg0, float arg1, int arg2) {}
-
-	@Override
-	public void onPageSelected(int position) {
-		Log.i(getClass().getSimpleName(), "Recuperando imagen con posicion: "+position);
-		if (currentMonumentId != null){
-			Log.i(getClass().getSimpleName(), "Monumento: "+ currentMonumentId);
-			int[] photos = MonumentList.getMonument(currentMonumentId).getPhotos();
-			if (photos.length > 0){
-				Log.i(getClass().getSimpleName(), "Imagen con id: "+photos[position]);
-				currentImage  = photos[position];
-			} 
-		}
-	}
-
-    public Toolbar getToolBar(){
-        return toolbar;
+    public void setCurrentMonumentId(String monumentId) {
+       currentMonumentId = monumentId; 
     }
 
-    public final int getCurrentImg() {
-        return currentImage;
-    }
 
-    public String getCurrentMonumentId(){
+    public String getCurrentMonumentId() {
         return currentMonumentId;
     }
-
-
-    public void setCurrentMonumentId(String monumentId){
-        currentMonumentId = monumentId;
-    }
-
 }

@@ -1,4 +1,4 @@
-package com.whiteandc.capture;
+package com.whiteandc.capture.fragments.camera;
 
 import android.app.Activity;
 import android.hardware.Camera;
