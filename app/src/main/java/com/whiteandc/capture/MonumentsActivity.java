@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewTreeObserver;
 
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
@@ -91,5 +92,15 @@ public class MonumentsActivity extends ActionBarActivity{
 
     public String getCurrentMonumentId() {
         return currentMonumentId;
+    }
+
+    public ViewTreeObserver setToolBarSizeObserver(ViewTreeObserver.OnGlobalLayoutListener treeObserver) {
+        ViewTreeObserver vto = toolbar.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(treeObserver);
+        return vto;
+    }
+
+    public int getToolbarHeight(){
+        return toolbar.getHeight();
     }
 }
