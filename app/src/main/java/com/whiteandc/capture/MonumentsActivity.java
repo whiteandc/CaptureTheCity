@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewTreeObserver;
+import android.widget.TextView;
 
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
@@ -41,7 +42,15 @@ public class MonumentsActivity extends ActionBarActivity{
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         toolbar.getMenu().clear();
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
+    public void setToolbarTitle(String cityName) {
+        if(toolbar != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            TextView toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+            Assets.setFont1(toolbarTitle, this);
+            toolbarTitle.setText(cityName);
+        }
     }
 
     private void setHomeButtonVisibility(boolean visibility){

@@ -24,6 +24,7 @@ public class FragmentCityList extends BasicFragment implements AdapterView.OnIte
 	private CityListAdapter adapter = null;
     private ListView list;
     private ViewTreeObserver vto;
+
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -36,12 +37,13 @@ public class FragmentCityList extends BasicFragment implements AdapterView.OnIte
 
         vto = monumentActivity.setToolBarSizeObserver(this);
 
+        monumentActivity.setToolbarTitle(MonumentList.getCityName());
 		return rootView;
 	}
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Monument monument= MonumentList.getList().get(position);
+        Monument monument= MonumentList.getList().get(position-1);
         monumentActivity.setCurrentMonumentId(monument.getName());
         monumentActivity.switchToFragmentNotCaptured();
     }

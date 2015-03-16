@@ -43,6 +43,8 @@ public class FragmentNotCaptured extends BasicFragment implements View.OnClickLi
 
         rootView.findViewById(R.id.camera_fab).setOnClickListener(this);
 
+        monumentActivity.setToolbarTitle(monument.getName());
+
         return rootView;
     }
 
