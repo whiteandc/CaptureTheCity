@@ -50,7 +50,7 @@ public class FragmentNotCaptured extends BasicFragment implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        monumentActivity.switchToFragmentCityList();
+        monumentActivity.switchToFragmentCamera();
     }
 
 }

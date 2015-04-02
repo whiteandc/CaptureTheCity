@@ -19,9 +19,16 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url "https://repo.commonsware.com.s3.amazonaws.com"
+    }
+}
+
 dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile project(':libraries:viewPagerIndicator')
     compile project(':libraries:opencv')
     compile 'com.getbase:floatingactionbutton:1.7.0'
+    compile 'com.commonsware.cwac:camera:0.6.+'
 }

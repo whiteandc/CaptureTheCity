@@ -73,9 +73,15 @@ public class CityListAdapter extends ArrayAdapter<Monument> {
         @Override
         //We should download the pictures here
         protected Drawable doInBackground(ViewHolder... params) {
+            Drawable image = null;
             ArrayList<Monument> monuments = MonumentList.getList();
             mMonument = monuments.get(mPosition);
-            Drawable image = mContext.getResources().getDrawable(mMonument.getPhotos()[0]);
+            if(mMonument.getMainPicture() == null) {
+                image = mContext.getResources().getDrawable(mMonument.getPhotos()[0]);
+                mMonument.setMainPicture(image);
+            }else{
+                image = mMonument.getMainPicture();
+            }
             return image;
         }
 

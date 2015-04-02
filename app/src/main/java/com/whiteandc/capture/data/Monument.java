@@ -1,6 +1,8 @@
 package com.whiteandc.capture.data;
 
 
+import android.graphics.drawable.Drawable;
+
 public class Monument implements Comparable{
 	
 	private String name= null;
@@ -8,6 +10,8 @@ public class Monument implements Comparable{
 	private boolean captured= false;
 	private String capturedImg= null;
 	private String description= "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
+
+    private Drawable mainPicture = null;
 
 	public Monument(String name, int[] photoList, boolean captured, String capturedImage){
 		this.name= name;
@@ -41,6 +45,14 @@ public class Monument implements Comparable{
 	public String getCapturedImg() {
 		return capturedImg;
 	}
-	
+
+
+    public Drawable getMainPicture() {
+        return mainPicture;
+    }
+
+    public void setMainPicture(Drawable mainPicture) {
+        this.mainPicture = mainPicture;
+    }
 
 }

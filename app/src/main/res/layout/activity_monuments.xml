@@ -1,15 +1,17 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/app_bar" />
 
     <FrameLayout
         android:id="@+id/fragment_placeholder"
         android:layout_height="match_parent"
         android:layout_width="match_parent"/>
 
-    <include
-        android:id="@+id/app_bar"
-        layout="@layout/app_bar" />
 
-</FrameLayout>
+</LinearLayout>

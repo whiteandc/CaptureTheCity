@@ -7,7 +7,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.whiteandc.capture.data.MonumentList;
@@ -17,6 +16,8 @@ import com.whiteandc.capture.fragments.list.FragmentCityList;
 import com.whiteandc.capture.fragments.notcaptured.FragmentNotCaptured;
 
 public class MonumentsActivity extends ActionBarActivity{
+
+    private static final String CLASS = "MonumentsActivity";
 
     private Toolbar toolbar;
     private String currentMonumentId = null;
@@ -98,18 +99,8 @@ public class MonumentsActivity extends ActionBarActivity{
        currentMonumentId = monumentId; 
     }
 
-
     public String getCurrentMonumentId() {
         return currentMonumentId;
     }
 
-    public ViewTreeObserver setToolBarSizeObserver(ViewTreeObserver.OnGlobalLayoutListener treeObserver) {
-        ViewTreeObserver vto = toolbar.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(treeObserver);
-        return vto;
-    }
-
-    public int getToolbarHeight(){
-        return toolbar.getHeight();
-    }
 }
