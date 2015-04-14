@@ -1,20 +1,20 @@
 package com.whiteandc.capture.fragments;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
+import android.os.Bundle;
 
 import com.whiteandc.capture.MonumentsActivity;
 
-public class BasicFragment extends Fragment{
+public abstract class BasicFragment extends Fragment{
 
     protected MonumentsActivity monumentActivity;
 
     @Override
-    public void onAttach(Activity activity) { //TODO extract super class
+    public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.monumentActivity = (MonumentsActivity) activity;
+        monumentActivity = (MonumentsActivity) getActivity();
     }
-
 
     @Override
     public void onDetach() {

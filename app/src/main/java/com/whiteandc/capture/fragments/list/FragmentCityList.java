@@ -23,9 +23,15 @@ public class FragmentCityList extends BasicFragment implements AdapterView.OnIte
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 		View rootView = inflater.inflate(R.layout.fragment_city_list, container, false);
 
-	    adapter = new CityListAdapter(this.getActivity());
+        monumentActivity.setFullScreen(false);
+        monumentActivity.setToolBarVisibility(true);
+        monumentActivity.setHomeButtonVisibility(false);
+        monumentActivity.setSelectedFragment(this);
+
+        adapter = new CityListAdapter(this.getActivity());
 	    list= (ListView) rootView.findViewById(R.id.city_list);
         list.setAdapter(adapter);
         list.setOnItemClickListener(this);

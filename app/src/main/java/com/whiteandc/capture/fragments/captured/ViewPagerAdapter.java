@@ -2,6 +2,7 @@ package com.whiteandc.capture.fragments.captured;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ public class ViewPagerAdapter extends PagerAdapter {
     public ViewPagerAdapter(Context context,  int[] monuments) {
         this.context = context;
         this.monument = monuments;
+
     }
  
     @Override
@@ -48,6 +50,7 @@ public class ViewPagerAdapter extends PagerAdapter {
  
         return itemView;
     }
+
  
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
@@ -58,4 +61,5 @@ public class ViewPagerAdapter extends PagerAdapter {
 	public void setMonument(int[] monument) {
 		this.monument = monument;
 	}
+
 }
