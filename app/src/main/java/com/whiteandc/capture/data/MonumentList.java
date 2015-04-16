@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 public class MonumentList {
 	public static HashMap<String, Monument> monumentList = new HashMap<String, Monument>();
-	
+    private static String cityName = "Málaga";
 	public static void addItem(Monument monument){
 		if(!monumentList.containsKey(monument.getName())){
 			monumentList.put(monument.getName(), monument);
@@ -33,6 +33,15 @@ public class MonumentList {
 	public static Monument getMonument(String name){
 		return monumentList.get(name);
 	}
+
+
+    public static String getCityName() {
+        return cityName;
+    }
+
+    public static void setCityName(String cityName) {
+        MonumentList.cityName = cityName;
+    }
 
 }
 

@@ -30,7 +30,7 @@
                 android:layout_gravity="center"/>
         </LinearLayout>
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/pink_icon"
+            android:id="@+id/camera_fab"
             android:layout_width="86dp"
             android:layout_height="86dp"
             fab:fab_colorNormal="@color/accentColor"
