@@ -1,5 +1,6 @@
 package com.whiteandc.capture.fragments.list;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
