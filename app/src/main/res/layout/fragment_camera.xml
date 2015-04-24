@@ -4,11 +4,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/camera"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"/>
+    <com.whiteandc.capture.fragments.camera.JavaCameraView
+        android:id="@+id/camera_surface_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"/>
 
 
     <ImageView
@@ -36,7 +35,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="center"
-            android:max="255"/>
+            android:max="255"
+            android:progressDrawable="@drawable/orange_scrubber_progress"
+            android:thumb="@drawable/orange_scrubber_control" />
 
         <ImageView
             android:id="@+id/transparence_max"

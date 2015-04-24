@@ -12,7 +12,6 @@ public class ZoomManager extends ScaleGestureDetector.SimpleOnScaleGestureListen
     private static final int NUM_STEP = 15;
 
     private Contract contractFulfiller;
-    private boolean enabled = true;
     private int progress = 0;
 
     public ZoomManager(Contract contractFulfiller){
@@ -22,17 +21,10 @@ public class ZoomManager extends ScaleGestureDetector.SimpleOnScaleGestureListen
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         float scaleFactor = detector.getScaleFactor();
-
         try {
-            if (enabled && contractFulfiller.doesZoomReallyWork()) {
+            if (contractFulfiller.doesZoomReallyWork()) {
                 getProgress(scaleFactor);
-                enabled = false;
-                contractFulfiller.zoomTo(progress).onComplete(new Runnable() {
-                    @Override
-                    public void run() {
-                        enabled = true;
-                    }
-                }).go();
+                contractFulfiller.zoomTo(progress);
             }
         }catch(CameraParameterNotReadyException e){
             Log.w(CLASS, "Camera properties unavailable", e);
@@ -66,7 +58,7 @@ public class ZoomManager extends ScaleGestureDetector.SimpleOnScaleGestureListen
     }
 
     public interface Contract{
-        public com.commonsware.cwac.camera.ZoomTransaction zoomTo(int level);
+        public void zoomTo(int level);
         public int getMaxZoom();
         public boolean doesZoomReallyWork();
     }
