@@ -1,5 +1,6 @@
 package com.whiteandc.capture.fragments.captured;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -19,7 +20,6 @@ public class FragmentCaptured extends Fragment {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-
 			rootView = inflater.inflate(R.layout.fragment_monument_captured, container, false);
 
 			loadCurrentMonumentData();

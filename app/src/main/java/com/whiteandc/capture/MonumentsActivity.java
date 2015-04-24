@@ -63,7 +63,9 @@ public class MonumentsActivity extends ActionBarActivity{
 
     public void setToolBarVisibility(boolean visible){
         int visibility = (visible) ? View.VISIBLE : View.GONE;
-        toolbar.setVisibility(visibility);
+        if(toolbar != null) {
+            toolbar.setVisibility(visibility);
+        }
     }
 
     public void setFullScreen(boolean fullScreen){
