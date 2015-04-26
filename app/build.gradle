@@ -31,4 +31,5 @@ dependencies {
     compile project(':libraries:opencv')
     compile 'com.getbase:floatingactionbutton:1.7.0'
     compile 'com.commonsware.cwac:camera:0.6.+'
+    compile 'com.android.support:support-v13:22.0.0'
 }
