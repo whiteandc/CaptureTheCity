@@ -23,7 +23,6 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
-import com.commonsware.cwac.camera.ZoomTransaction;
 import com.whiteandc.capture.MonumentsActivity;
 import com.whiteandc.capture.R;
 import com.whiteandc.capture.opencv.OpenCVUtil;
@@ -35,7 +34,8 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 public class FragmentCamera extends Fragment implements CameraBridgeViewBase.CvCameraViewListener2,
-        ZoomManager.Contract, View.OnTouchListener, SeekBar.OnSeekBarChangeListener, ImageMatcherThread.FrameProvider {
+        ZoomManager.Contract, View.OnTouchListener, SeekBar.OnSeekBarChangeListener, ImageMatcherThread.FrameProvider,
+        MonumentsActivity.OnBackPressedListener {
 
     private static final String PICTURE = "PICTURE";
     private static final String CLASS = "FragmentCamera";
@@ -82,11 +82,8 @@ public class FragmentCamera extends Fragment implements CameraBridgeViewBase.CvC
         MonumentsActivity monumentsActivity = (MonumentsActivity) getActivity();
         monumentsActivity.setFullScreen(true);
         monumentsActivity.setToolBarVisibility(false);
-        monumentsActivity.setSelectedFragment(this);
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         scaleGestureDetector = new ScaleGestureDetector(getActivity(), new ZoomManager(this));
-
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     @Override
@@ -149,6 +146,12 @@ public class FragmentCamera extends Fragment implements CameraBridgeViewBase.CvC
     public void onPause(){
         super.onPause();
         getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if(myOrientationEventListener != null) {
+            myOrientationEventListener.disable();
+        }
+        if(mOpenCvCameraView != null){
+            mOpenCvCameraView.disableView();
+        }
         if(imageMatcherThread != null){
             imageMatcherThread.interrupt();
         }
@@ -165,9 +168,6 @@ public class FragmentCamera extends Fragment implements CameraBridgeViewBase.CvC
     @Override
     public void onDestroy() {
         super.onDestroy();
-        myOrientationEventListener.disable();
-        mOpenCvCameraView.disableView();
-        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     /**
@@ -259,5 +259,11 @@ public class FragmentCamera extends Fragment implements CameraBridgeViewBase.CvC
     @Override
     public Mat getFrame() {
         return currentFrame;
+    }
+
+    @Override
+    public void onBackPressed(MonumentsActivity monumentsActivity) {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        monumentsActivity.switchToDetailAdapter();
     }
 }
