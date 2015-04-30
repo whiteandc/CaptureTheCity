@@ -1,7 +1,7 @@
 package com.whiteandc.capture.fragments.list;
 
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +45,6 @@ public class FragmentCityList extends BasicFragment implements AdapterView.OnIte
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Monument monument= MonumentList.getList().get(position);
         monumentActivity.setCurrentMonumentId(monument.getName());
-        monumentActivity.switchToFragmentNotCaptured();
+        monumentActivity.switchToDetailAdapter();
     }
 }
