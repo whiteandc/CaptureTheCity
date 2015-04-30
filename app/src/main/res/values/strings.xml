@@ -23,4 +23,8 @@
     <string name="launch_full_screen">Launch Full-Screen</string>
     <string name="mirror_ffc">Mirror FFC</string>
 
+    <string name="tab_monuments">Monuments</string>
+    <string name="tab_monument">Monument</string>
+    <string name="tab_map">Map</string>
+
 </resources>
