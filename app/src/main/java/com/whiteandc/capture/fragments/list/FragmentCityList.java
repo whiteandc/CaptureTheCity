@@ -30,7 +30,6 @@ public class FragmentCityList extends BasicFragment implements AdapterView.OnIte
         monumentActivity.setFullScreen(false);
         monumentActivity.setToolBarVisibility(true);
         monumentActivity.setHomeButtonVisibility(false);
-        monumentActivity.setSelectedFragment(this);
 
         adapter = new CityListAdapter(this.getActivity());
 	    list= (ListView) rootView.findViewById(R.id.city_list);

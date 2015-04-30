@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,29 +28,28 @@ import com.whiteandc.capture.tabs.ViewPagerAdapterTabs;
 public class MonumentsActivity extends ActionBarActivity {
 
     private static final String CLASS = "MonumentsActivity";
+    public static final String CAMERA = "CAMERA";
 
-    private Fragment selectedFragment;
     private Toolbar toolbar;
-    private String currentMonumentId = null;
+    private String currentMonumentId;
     private ViewPager pager;
     private ViewPagerAdapterTabs adapter;
     private SlidingTabLayout tabs;
     private FrameLayout fragPlaceholder;
+    private OnBackPressedListener backPressedListener;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monuments);
-
         toolbarCreation();
 
 
         fragPlaceholder = (FrameLayout) findViewById(R.id.fragment_placeholder);
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        CharSequence[] titles= new CharSequence[]{getResources().getString(R.string.tab_monuments), getResources().getString(R.string.tab_map)};
-        adapter = new ViewPagerAdapterTabs(getFragmentManager(),titles , titles.length, new FragmentCityList(), new FragmentMap());
-
+        CharSequence[] titles = new CharSequence[]{getResources().getString(R.string.tab_monuments), getResources().getString(R.string.tab_map)};
+        adapter = new ViewPagerAdapterTabs(getFragmentManager(), titles, titles.length);
 
         // Assigning ViewPager View and setting the adapter
         pager = (ViewPager) findViewById(R.id.pager);
@@ -57,7 +57,7 @@ public class MonumentsActivity extends ActionBarActivity {
 
         // Assiging the Sliding Tab Layout View
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);
-        tabs.setDistributeEvenly(true); // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
+        tabs.setDistributeEvenly(true); // Makes the Tabs Fixed
 
         // TODO Setting Custom Color for the Scroll bar indicator of the Tab View
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
@@ -72,16 +72,28 @@ public class MonumentsActivity extends ActionBarActivity {
 
 
         MonumentLoader.loadMonuments(getPreferences(MODE_PRIVATE));
+
         if (MonumentList.getList().size() > 0) {
             currentMonumentId = MonumentList.getList().get(0).getName();
         }
 
+        if(savedInstanceState != null && savedInstanceState.getBoolean(CAMERA)){
+            switchToFragmentCamera(MonumentList.getMonument(currentMonumentId).getPhotos()[0]);
+        }else {
+            switchToListAdapter();
+        }
     }
 
     private void toolbarCreation() {
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         toolbar.getMenu().clear();
         setSupportActionBar(toolbar);
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        // super.onSaveInstanceState(outState);
+        outState.putBoolean(CAMERA, true);
     }
 
     public void setToolbarTitle(String cityName) {
@@ -115,30 +127,36 @@ public class MonumentsActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(visibility);
     }
 
-    public void switchToListAdapter() {//TODO refactor
-        adapter.deleteFragments();
-        //This adapter will be used when a monument is selected
-        adapter.setFragments(new FragmentCityList(), new FragmentMap());
-        adapter.setAdapterList(true);
-        adapter.setTitles(new CharSequence[]{getResources().getString(R.string.tab_monuments), getResources().getString(R.string.tab_map)});
-        tabs.updateTextTitles();
-        pager.setAdapter(adapter);
+    public void switchToListAdapter() {
+        switchToAdapter(new FragmentCityList(), new FragmentMap());
     }
 
-    public void switchToDetailAdapter() { //TODO refactor
+    public void switchToDetailAdapter() {
+        switchToAdapter(new FragmentNotCaptured(), new FragmentMapDetail());
+    }
+
+    private void switchToAdapter(Fragment leftFragment, Fragment rightFragment){
+        Log.i(CLASS, "switchToAdapter: "+leftFragment.getClass().getSimpleName());
+        if(backPressedListener instanceof Fragment) {
+            getFragmentManager().beginTransaction().remove((Fragment) backPressedListener).commit();
+        }
+        tabs.setVisibility(View.VISIBLE);
+        pager.setVisibility(View.VISIBLE);
+        fragPlaceholder.setVisibility(View.GONE);
+        backPressedListener = adapter;
         adapter.deleteFragments();
-        //This adapter will be used when a monument is selected
-        adapter.setFragments(new FragmentNotCaptured(), new FragmentMapDetail());
-        adapter.setAdapterList(false);
+        adapter.setFragments(leftFragment, rightFragment);
         adapter.setTitles(new CharSequence[]{getResources().getString(R.string.tab_monument), getResources().getString(R.string.tab_map)});
         tabs.updateTextTitles();
         pager.setAdapter(adapter);
     }
 
     public void switchToFragmentCamera(int currentPicture) {
+        final FragmentCamera fragmentCamera = FragmentCamera.newInstance(currentPicture);
+        backPressedListener = fragmentCamera;
         tabs.setVisibility(View.GONE);
         pager.setVisibility(View.GONE);
-        switchFragment(FragmentCamera.newInstance(currentPicture));
+        switchFragment(fragmentCamera);
         fragPlaceholder.setVisibility(View.VISIBLE);
     }
 
@@ -176,21 +194,10 @@ public class MonumentsActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        if (!adapter.isAdapterList() && (selectedFragment != null) &&(selectedFragment instanceof FragmentCamera)) {
-            getFragmentManager().beginTransaction().remove(selectedFragment).commit();
-            tabs.setVisibility(View.VISIBLE);
-            pager.setVisibility(View.VISIBLE);
-            fragPlaceholder.setVisibility(View.GONE);
-            setToolBarVisibility(true);
-            selectedFragment= null;
-        } else if (!adapter.isAdapterList()) {
-            switchToListAdapter();
-        } else {
-            super.onBackPressed();
-        }
+        backPressedListener.onBackPressed(this);
     }
 
-    public void setSelectedFragment(Fragment selectedFragment) {
-        this.selectedFragment = selectedFragment;
+    public interface OnBackPressedListener {
+        public void onBackPressed(MonumentsActivity monumentsActivity);
     }
 }
