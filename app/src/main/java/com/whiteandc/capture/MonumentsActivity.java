@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.commonsware.cwac.camera.CameraFragment;
+import com.whiteandc.capture.data.Monument;
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
 import com.whiteandc.capture.fragments.BasicFragment;
@@ -33,11 +34,19 @@ public class MonumentsActivity extends ActionBarActivity{
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_monuments);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_monuments);
 
         toolbarCreation();
-        switchToFragmentCityList();
+
+        if (selectedFragment == null) {
+            switchToFragmentCityList();
+        } else {
+            if (selectedFragment instanceof FragmentCamera){
+                setToolBarVisibility(false);
+            }
+            switchFragment(selectedFragment);
+        }
 
         MonumentLoader.loadMonuments(getPreferences(MODE_PRIVATE));
 		if(MonumentList.getList().size()>0){

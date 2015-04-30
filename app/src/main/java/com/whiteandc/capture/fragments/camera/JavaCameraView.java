@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -11,6 +12,7 @@ import android.hardware.Camera.PreviewCallback;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.ViewGroup.LayoutParams;
 
 import org.opencv.android.CameraBridgeViewBase;
@@ -192,8 +194,10 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                     } else
                         mCamera.setPreviewDisplay(null);
 
-                    setDisplayOrientation(mCamera, 90);
-                    mCamera.setPreviewDisplay(getHolder());
+//                    setDisplayOrientation(mCamera, 90);
+//                    SurfaceHolder holder = getHolder();
+//                    mCamera.setPreviewDisplay(holder);
+
                     /* Finally we are ready to start the preview */
                     Log.d(TAG, "startPreview");
                     mCamera.startPreview();
