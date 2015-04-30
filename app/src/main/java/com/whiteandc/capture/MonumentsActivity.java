@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
 import com.whiteandc.capture.fragments.FragmentMap;
@@ -36,11 +37,12 @@ public class MonumentsActivity extends ActionBarActivity {
     private FrameLayout fragPlaceholder;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monuments);
 
         toolbarCreation();
+
 
         fragPlaceholder = (FrameLayout) findViewById(R.id.fragment_placeholder);
 
