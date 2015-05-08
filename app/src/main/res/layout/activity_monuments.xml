@@ -8,13 +8,6 @@
         android:id="@+id/app_bar"
         layout="@layout/app_bar" />
 
-
-    <FrameLayout
-        android:id="@+id/fragment_placeholder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
-
     <com.whiteandc.capture.tabs.SlidingTabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"

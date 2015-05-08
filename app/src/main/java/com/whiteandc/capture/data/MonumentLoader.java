@@ -22,7 +22,7 @@ public class MonumentLoader {
 		addMonument(sharedpreferences, "Museo Picasso", new int[]{R.drawable.museo_picasso_entrada, R.drawable.museo_picasso_entrada2, R.drawable.museo_picasso_patio});
 		addMonument(sharedpreferences, "Piramide", new int[]{R.drawable.piramide, R.drawable.piramide_1, R.drawable.piramide_2, R.drawable.piramide_3});
 		addMonument(sharedpreferences, "Teatro romano", new int[]{R.drawable.teatro_romano_alta, R.drawable.teatro_romano_baja, R.drawable.teatro_romano_baja2, R.drawable.teatro_romano_cartel, R.drawable.teatroromano_entrada, R.drawable.teatroromano_entrada_1});
-	//	addMonument(sharedpreferences, "Imagenes de prueba", new int[]{R.drawable.torre});
+		addMonument(sharedpreferences, "Test", new int[]{R.drawable.test1,R.drawable.test2});
 	}
 
 	private static void addMonument(SharedPreferences sharedpreferences, String name, int [] photos) {

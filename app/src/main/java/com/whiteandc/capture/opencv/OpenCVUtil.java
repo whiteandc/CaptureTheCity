@@ -1,5 +1,8 @@
 package com.whiteandc.capture.opencv;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -35,27 +38,46 @@ public class OpenCVUtil {
 	static {
 	    if (!OpenCVLoader.initDebug()) {}
 	}
-	public static boolean compare2Images(String capturedImgName, int imageResourceID, FragmentActivity fragmentActivity, StringBuilder debugInfo) throws IOException{
-		//Load images to compare
-		Mat img1 = Highgui.imread(capturedImgName, Highgui.CV_LOAD_IMAGE_COLOR);
-		Mat img2=null;
-		try {
-			img2 = Utils.loadResource(fragmentActivity, imageResourceID, Highgui.CV_LOAD_IMAGE_COLOR);
-		} catch (IOException e) {
-			Log.e(CLASS, "Error: ", e);
-			throw e;
-		} 
-	
-		debugInfo.append( "Tamano de la imagen a reproducir = "+img2.size()+"\n");
-		debugInfo.append("Tamano original de la imagen capturada = "+img1.size()+"\n");
-		if(img2.size().width < img2.size().height){
-			Imgproc.resize(img1, img1, new Size(img2.size().height, img2.size().width));
-			Core.flip(img1.t(), img1, 1);
-		}else{
-			Imgproc.resize(img1, img1, img2.size());
-		}
-		debugInfo.append("Tamano tras resize() de la imagen capturada = "+img1.size()+"\n");
-		
+
+    public static Mat resourceToMat(int imageResourceID, Activity activity)  {
+        Mat resource = null;
+        try {
+            resource =  Utils.loadResource(activity, imageResourceID, Highgui.CV_LOAD_IMAGE_COLOR);
+        } catch (IOException e) {
+            Log.e(CLASS, "Error loading resource: " + imageResourceID, e);
+        }
+        return resource;
+    }
+
+	public static boolean compare2Images(Mat capturedImage, Mat referenceImage, boolean storeResults){
+
+        // Adjust the orientation
+        if(!sameOrientation(capturedImage, referenceImage)){
+            Core.flip(referenceImage.t(), referenceImage, 1); // Rotate 90°
+        }
+
+        Log.i(CLASS, "Before scale adjust");
+        Log.i(CLASS, "Captured image size: "  + capturedImage.size());
+        Log.i(CLASS, "Reference image size: " + referenceImage.size());
+
+        if(storeResults)
+            storePicture(capturedImage);
+        // Adjust the scale
+        if(referenceImage.size().width > capturedImage.size().width){
+            Size size = calculateSize(capturedImage, referenceImage);
+            Imgproc.resize(referenceImage, referenceImage, size);
+        }else{
+            Size size = calculateSize(referenceImage, capturedImage);
+
+            Imgproc.resize(capturedImage, capturedImage, size);
+        }
+
+        Log.i(CLASS, "After scale adjust");
+        Log.i(CLASS, "Captured image size: "  + capturedImage.size());
+        Log.i(CLASS, "Reference image size: " + referenceImage.size());
+
+        if(storeResults)
+            storePicture(capturedImage);
 		//Key Points
 		MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
 		MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
@@ -63,66 +85,77 @@ public class OpenCVUtil {
 		// Descriptors
 		Mat descriptors1 = new Mat();
 		Mat descriptors2 = new Mat();
-	
+
 		//Definition of ORB keypoint detector and descriptor extractors
-		FeatureDetector detector = FeatureDetector.create(FeatureDetector.ORB); 
+		FeatureDetector detector = FeatureDetector.create(FeatureDetector.ORB);
 		DescriptorExtractor extractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
 	
 		//Detect keypoints
-		detector.detect(img1, keypoints1);
-		detector.detect(img2, keypoints2);  
-		debugInfo.append("Tamano de los keypoints de la imagen capturada = "+keypoints1.size()+"\n");
-		debugInfo.append("Tamano de los keypoints de la imagen a reproducir = "+keypoints2.size()+"\n");
-		
+		detector.detect(capturedImage, keypoints1);
+		detector.detect(referenceImage, keypoints2);
+
 		//Extract descriptors
-		extractor.compute(img1, keypoints1, descriptors1);
-		extractor.compute(img2, keypoints2, descriptors2);
-		debugInfo.append("Tamano de los descriptores de la imagen capturada = "+descriptors1.size()+"\n");
-		debugInfo.append("Tamano de los descriptores de la imagen a reproducir = "+descriptors2.size()+"\n");
-		
+		extractor.compute(capturedImage, keypoints1, descriptors1);
+		extractor.compute(referenceImage, keypoints2, descriptors2);
+
 		//Definition of descriptor matcher
 		DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
 	
 		//Match points of two images
 		MatOfDMatch matches = new MatOfDMatch();
-		matcher.match(descriptors1,descriptors2 ,matches);
-		debugInfo.append("Tamano de los matches = "+matches.size()+"\n");
+		matcher.match(descriptors1, descriptors2 ,matches);
 
 		MatOfDMatch good = new MatOfDMatch();
-		good.fromList(getMatchesPercentage(matches, keypoints1, keypoints2, debugInfo));
-		debugInfo.append("Tamano de los matches BUENOS = "+good.size()+"\n");
-		
-		storeMatchesPicture(img1, img2, keypoints1, keypoints2, good);
-		
-		return good.size().height >= MIN_GOOD_MATCHES;
+		good.fromList(getMatchesPercentage(matches));
+
+        final boolean match = good.size().height >= MIN_GOOD_MATCHES;
+        if(match || storeResults) {
+            storeMatchesPicture(capturedImage, referenceImage, keypoints1, keypoints2, good);
+        }
+
+        return match;
 	}
 
-	private static void storeMatchesPicture(Mat img1, Mat img2,
+    private static Size calculateSize(Mat mat1, Mat mat2) {
+        double ratio = mat2.size().width / mat2.size().height;
+        return new Size(mat1.size().width, mat1.size().width*ratio);
+    }
+
+    private static void storeMatchesPicture(Mat img1, Mat img2,
 			MatOfKeyPoint keypoints1, MatOfKeyPoint keypoints2, MatOfDMatch good) {
 		Mat outImg = new Mat();
-		Features2d.drawMatches(img1, keypoints1, img2, keypoints2, good, outImg);
-		File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES+File.separator+"CaptureTheCity"+File.separator+"Debug");
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        
-        
-		if (! path.exists()){
-            if (! path.mkdirs()){
-                Log.d("Camera Guide", "Required media storage does not exist");
-            }
-        }
-        File file = new File(path,"IMG_"+ timeStamp + ".jpg");
 
-		boolean bool = false;
-		bool = Highgui.imwrite(file.toString(), outImg);
-		if (bool == true){
-			Log.d(CLASS, "SUCCESS writing image to external storage");
-		}else{
-			Log.d(CLASS, "Fail writing image to external storage");
-		}
+        Features2d.drawMatches(img1, keypoints1, img2, keypoints2, good, outImg);
+
+        storePicture(outImg);
 	}
-	
-	private static LinkedList<DMatch> getMatchesPercentage(MatOfDMatch matches, MatOfKeyPoint keypoints1, MatOfKeyPoint keypoints2, StringBuilder debugInfo){
+
+    private static void storePicture(Mat outImg) {
+        Log.i(CLASS, "Storing picture");
+
+//        File path = Environment.getExternalStoragePublicDirectory(
+//                Environment.DIRECTORY_PICTURES + File.separator + "CaptureTheCity" + File.separator + "Debug");
+//        // Create a media file name
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//
+//        if (! path.exists()){
+//            if (! path.mkdirs()){
+//                Log.i(CLASS, "Required media storage does not exist");
+//            }
+//        }
+//        File file = new File(path,"CAPTURE_"+ timeStamp + ".jpg");
+//
+//        boolean bool = Highgui.imwrite(file.toString(), outImg);
+//        if (bool == true){
+//            Log.i(CLASS, "SUCCESS writing image to external storage");
+//        }else{
+//            Log.i(CLASS, "Fail writing image to external storage");
+//        }
+
+
+    }
+
+    private static LinkedList<DMatch> getMatchesPercentage(MatOfDMatch matches){
 		List<DMatch> matchesList = matches.toList();
 		Double max_dist = 0.0;
 		Double min_dist = 100.0;
@@ -134,9 +167,6 @@ public class OpenCVUtil {
 		    if (dist > max_dist)
 		    max_dist = dist;
 		}
-
-		debugInfo.append("Distancia m�xima calculada: "+max_dist+"\n");
-		debugInfo.append("Distancia m�nima calculada: "+min_dist+"\n");
 		
 		LinkedList<DMatch> good_matches = new LinkedList<DMatch>();
 		for (int i = 0; i < matchesList.size(); i++)  {  
@@ -148,4 +178,9 @@ public class OpenCVUtil {
 		return good_matches;
 	}
 
+
+    private static boolean sameOrientation(Mat mat1, Mat mat2){
+        return (mat1.size().width > mat1.size().height && mat2.size().width > mat2.size().height) ||
+               (mat1.size().width < mat1.size().height && mat2.size().width < mat2.size().height);
+    }
 }
