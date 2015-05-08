@@ -1,7 +1,7 @@
 package com.whiteandc.capture;
 
 import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -11,14 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.whiteandc.capture.data.Monument;
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
 import com.whiteandc.capture.fragments.FragmentMap;
 import com.whiteandc.capture.fragments.FragmentMapDetail;
-import com.whiteandc.capture.fragments.camera.FragmentCamera;
 import com.whiteandc.capture.fragments.list.FragmentCityList;
 import com.whiteandc.capture.fragments.notcaptured.FragmentNotCaptured;
 import com.whiteandc.capture.tabs.SlidingTabLayout;
@@ -27,14 +26,13 @@ import com.whiteandc.capture.tabs.ViewPagerAdapterTabs;
 public class MonumentsActivity extends ActionBarActivity {
 
     private static final String CLASS = "MonumentsActivity";
-    public static final String CAMERA = "CAMERA";
+    private static final int CAMERA_REQUEST_CODE = 10000;
 
     private Toolbar toolbar;
     private String currentMonumentId;
     private ViewPager pager;
     private ViewPagerAdapterTabs adapter;
     private SlidingTabLayout tabs;
-    private FrameLayout fragPlaceholder;
     private OnBackPressedListener backPressedListener;
 
     @Override
@@ -42,8 +40,6 @@ public class MonumentsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monuments);
         toolbarCreation();
-
-        fragPlaceholder = (FrameLayout) findViewById(R.id.fragment_placeholder);
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
         CharSequence[] titles = new CharSequence[]{getResources().getString(R.string.tab_monuments), getResources().getString(R.string.tab_map)};
@@ -67,30 +63,14 @@ public class MonumentsActivity extends ActionBarActivity {
 
         // Setting the ViewPager For the SlidingTabsLayout
         tabs.setViewPager(pager);
-
         MonumentLoader.loadMonuments(getPreferences(MODE_PRIVATE));
-
-        if (MonumentList.getList().size() > 0) {
-            currentMonumentId = MonumentList.getList().get(0).getName();
-        }
-
-        if(savedInstanceState != null && savedInstanceState.getBoolean(CAMERA)){
-            switchToFragmentCamera(MonumentList.getMonument(currentMonumentId).getPhotos()[0]);
-        }else {
-            switchToListAdapter();
-        }
+        switchToListAdapter();
     }
 
     private void toolbarCreation() {
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         toolbar.getMenu().clear();
         setSupportActionBar(toolbar);
-    }
-
-    @Override
-    protected void onSaveInstanceState(final Bundle outState) {
-        // super.onSaveInstanceState(outState);
-        outState.putBoolean(CAMERA, true);
     }
 
     public void setToolbarTitle(String cityName) {
@@ -139,29 +119,12 @@ public class MonumentsActivity extends ActionBarActivity {
         }
         tabs.setVisibility(View.VISIBLE);
         pager.setVisibility(View.VISIBLE);
-        fragPlaceholder.setVisibility(View.GONE);
         backPressedListener = adapter;
         adapter.deleteFragments();
         adapter.setFragments(leftFragment, rightFragment);
         adapter.setTitles(new CharSequence[]{getResources().getString(R.string.tab_monument), getResources().getString(R.string.tab_map)});
         tabs.updateTextTitles();
         pager.setAdapter(adapter);
-    }
-
-    public void switchToFragmentCamera(int currentPicture) {
-        final FragmentCamera fragmentCamera = FragmentCamera.newInstance(currentPicture);
-        backPressedListener = fragmentCamera;
-        tabs.setVisibility(View.GONE);
-        pager.setVisibility(View.GONE);
-        switchFragment(fragmentCamera);
-        fragPlaceholder.setVisibility(View.VISIBLE);
-    }
-
-    private void switchFragment(Fragment fragment) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_placeholder, fragment);
-        ft.addToBackStack("back");
-        ft.commit();
     }
 
     @Override
@@ -192,6 +155,30 @@ public class MonumentsActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() {
         backPressedListener.onBackPressed(this);
+    }
+
+    public void startCameraActivity(int currentPicture) {
+        Monument monument = MonumentList.getMonument(currentMonumentId);
+        Intent intent = new Intent(this, CameraActivity.class);
+        intent.putExtra(Assets.CURRENT_PICTURE, currentPicture);
+        intent.putExtra(Assets.MONUMENT_ID, currentMonumentId);
+        intent.putExtra(Assets.PICTURE_RESOURCE, monument.getPhotos()[currentPicture]);
+
+        startActivityForResult(intent, CAMERA_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(CLASS, "result: "+requestCode+"  "+resultCode);
+        if(requestCode == CAMERA_REQUEST_CODE){
+            currentMonumentId = data.getStringExtra(Assets.MONUMENT_ID);
+            if(resultCode == RESULT_OK){
+                Log.i(CLASS, "ok!");
+            }else if(resultCode == RESULT_CANCELED){
+                Log.i(CLASS, "cancelled!");
+            }
+        }
+
     }
 
     public interface OnBackPressedListener {

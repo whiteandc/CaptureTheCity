@@ -1,6 +1,8 @@
 package com.whiteandc.capture.opencv;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -66,16 +68,16 @@ public class OpenCVUtil {
             Imgproc.resize(referenceImage, referenceImage, size);
         }else{
             Size size = calculateSize(referenceImage, capturedImage);
+
             Imgproc.resize(capturedImage, capturedImage, size);
         }
-
-        if(storeResults)
-            storePicture(capturedImage);
 
         Log.i(CLASS, "After scale adjust");
         Log.i(CLASS, "Captured image size: "  + capturedImage.size());
         Log.i(CLASS, "Reference image size: " + referenceImage.size());
 
+        if(storeResults)
+            storePicture(capturedImage);
 		//Key Points
 		MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
 		MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
@@ -131,24 +133,26 @@ public class OpenCVUtil {
     private static void storePicture(Mat outImg) {
         Log.i(CLASS, "Storing picture");
 
-        File path = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES + File.separator + "CaptureTheCity" + File.separator + "Debug");
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//        File path = Environment.getExternalStoragePublicDirectory(
+//                Environment.DIRECTORY_PICTURES + File.separator + "CaptureTheCity" + File.separator + "Debug");
+//        // Create a media file name
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//
+//        if (! path.exists()){
+//            if (! path.mkdirs()){
+//                Log.i(CLASS, "Required media storage does not exist");
+//            }
+//        }
+//        File file = new File(path,"CAPTURE_"+ timeStamp + ".jpg");
+//
+//        boolean bool = Highgui.imwrite(file.toString(), outImg);
+//        if (bool == true){
+//            Log.i(CLASS, "SUCCESS writing image to external storage");
+//        }else{
+//            Log.i(CLASS, "Fail writing image to external storage");
+//        }
 
-        if (! path.exists()){
-            if (! path.mkdirs()){
-                Log.i(CLASS, "Required media storage does not exist");
-            }
-        }
-        File file = new File(path,"CAPTURE_"+ timeStamp + ".jpg");
 
-        boolean bool = Highgui.imwrite(file.toString(), outImg);
-        if (bool == true){
-            Log.i(CLASS, "SUCCESS writing image to external storage");
-        }else{
-            Log.i(CLASS, "Fail writing image to external storage");
-        }
     }
 
     private static LinkedList<DMatch> getMatchesPercentage(MatOfDMatch matches){

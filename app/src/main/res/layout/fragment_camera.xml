@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <com.whiteandc.capture.fragments.camera.JavaCameraView
+    <com.whiteandc.capture.fragments.camera.CustomJavaCameraView
         android:id="@+id/camera_surface_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>
@@ -29,16 +29,14 @@
             android:layout_height="wrap_content"
             android:src="@drawable/transparence_max" />
 
-        <SeekBar
+        <com.whiteandc.capture.util.VerticalSeekBar
+            android:padding="10dp"
             android:id="@+id/transparence"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="center"
             android:max="255"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:rotation="270"
             android:progressDrawable="@drawable/orange_scrubber_progress"
             android:thumb="@drawable/orange_scrubber_control" />
 

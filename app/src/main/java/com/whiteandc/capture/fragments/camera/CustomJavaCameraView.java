@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -12,7 +11,6 @@ import android.hardware.Camera.PreviewCallback;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.SurfaceHolder;
 import android.view.ViewGroup.LayoutParams;
 
 import org.opencv.android.CameraBridgeViewBase;
@@ -24,7 +22,7 @@ import org.opencv.imgproc.Imgproc;
 /**
  * Inspired in the org.opencv.android.CameraBridgeViewBase
  */
-public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallback {
+public class CustomJavaCameraView extends CameraBridgeViewBase implements PreviewCallback {
 
     private static final int MAGIC_TEXTURE_ID = 10;
     private static final String TAG = "JavaCameraView";
@@ -54,11 +52,11 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
         }
     }
 
-    public JavaCameraView(Context context, int cameraId) {
+    public CustomJavaCameraView(Context context, int cameraId) {
         super(context, cameraId);
     }
 
-    public JavaCameraView(Context context, AttributeSet attrs) {
+    public CustomJavaCameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -353,10 +351,10 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
         @Override
         public void run() {
             do {
-                synchronized (JavaCameraView.this) {
+                synchronized (CustomJavaCameraView.this) {
                     try {
                         while (!mCameraFrameReady && !mStopThread) {
-                            ((Object) JavaCameraView.this).wait();
+                            ((Object) CustomJavaCameraView.this).wait();
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
