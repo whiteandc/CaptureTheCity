@@ -15,23 +15,26 @@ public class ImageMatcherThread extends Thread{
     private long lastExecution = System.currentTimeMillis();
     private Activity activity;
     private Mat[] monuments;
-    private FrameProvider frameProvider;
+    private Contract contract;
 
-    public ImageMatcherThread(Activity activity, FrameProvider frameProvider, Mat[] monuments){
+    public ImageMatcherThread(Activity activity, Contract contract, Mat[] monuments){
+        Log.i(CLASS, "ImageMatcherThread.");
         this.activity = activity;
-        this.frameProvider = frameProvider;
+        this.contract = contract;
         this.monuments = monuments;
     }
 
     public void run(){
         while(!isInterrupted()){
-            Mat currentFrame = frameProvider.getFrame();
+            Mat currentFrame = contract.getFrame();
             if(currentFrame != null) {
+                Log.i(CLASS, "currentFrame != null. Time: "+System.currentTimeMillis());
                 boolean match = compare(currentFrame, monuments);
                 if (match) {
-                    executeToast("Captured");
+                    finishCaptured("Captured");
                 }
             }else{
+                Log.i(CLASS, "currentFrame == null.");
                 // Sleep to avoid overuse of handset's resources
                 try {
                     Thread.sleep(100L);
@@ -42,12 +45,12 @@ public class ImageMatcherThread extends Thread{
         }
     }
 
-    private void executeToast(final String msg) {
+    private void finishCaptured(final String msg) {
         activity.runOnUiThread(
                 new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+                        contract.finishActivity(Activity.RESULT_OK);
                     }
                 }
         );
@@ -58,6 +61,7 @@ public class ImageMatcherThread extends Thread{
         int i = 0;
         boolean storeResults = storeResults();
         while(monuments.length > i && !match){
+            Log.i(CLASS, "start compare");
             match = OpenCVUtil.compare2Images(currentFrame, monuments[i], storeResults);
         }
         return match;
@@ -70,10 +74,13 @@ public class ImageMatcherThread extends Thread{
             storeResult = true;
             lastExecution = currentTime;
         }
+
+        Log.i(CLASS, "storeResult = " + storeResult);
         return storeResult;
     }
 
-    public interface FrameProvider{
+    public interface Contract {
         public Mat getFrame();
+        public void finishActivity(int status);
     }
 }

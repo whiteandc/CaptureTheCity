@@ -1,9 +1,9 @@
 package com.whiteandc.capture.fragments.notcaptured;
 
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +29,7 @@ public class FragmentNotCaptured extends BasicFragment implements View.OnClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        Log.i(CLASS, "monumentActivity.getCurrentMonumentId(): "+monumentActivity.getCurrentMonumentId());
         monument = MonumentList.getMonument(monumentActivity.getCurrentMonumentId());
         View rootView = inflater.inflate(R.layout.fragment_monument_not_captured, container, false);
 
@@ -54,7 +55,7 @@ public class FragmentNotCaptured extends BasicFragment implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        monumentActivity.startCameraActivity(currentPicture);
     }
 
     @Override
