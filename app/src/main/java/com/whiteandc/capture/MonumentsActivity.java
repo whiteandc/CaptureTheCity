@@ -1,23 +1,23 @@
 package com.whiteandc.capture;
 
 import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.whiteandc.capture.data.Monument;
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
 import com.whiteandc.capture.fragments.FragmentMap;
 import com.whiteandc.capture.fragments.FragmentMapDetail;
-import com.whiteandc.capture.fragments.camera.FragmentCamera;
 import com.whiteandc.capture.fragments.list.FragmentCityList;
 import com.whiteandc.capture.fragments.notcaptured.FragmentNotCaptured;
 import com.whiteandc.capture.tabs.SlidingTabLayout;
@@ -26,28 +26,24 @@ import com.whiteandc.capture.tabs.ViewPagerAdapterTabs;
 public class MonumentsActivity extends ActionBarActivity {
 
     private static final String CLASS = "MonumentsActivity";
+    private static final int CAMERA_REQUEST_CODE = 10000;
 
-    private Fragment selectedFragment;
     private Toolbar toolbar;
-    private String currentMonumentId = null;
+    private String currentMonumentId;
     private ViewPager pager;
     private ViewPagerAdapterTabs adapter;
     private SlidingTabLayout tabs;
-    private FrameLayout fragPlaceholder;
+    private OnBackPressedListener backPressedListener;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monuments);
-
         toolbarCreation();
 
-        fragPlaceholder = (FrameLayout) findViewById(R.id.fragment_placeholder);
-
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        CharSequence[] titles= new CharSequence[]{getResources().getString(R.string.tab_monuments), getResources().getString(R.string.tab_map)};
-        adapter = new ViewPagerAdapterTabs(getFragmentManager(),titles , titles.length, new FragmentCityList(), new FragmentMap());
-
+        CharSequence[] titles = new CharSequence[]{getResources().getString(R.string.tab_monuments), getResources().getString(R.string.tab_map)};
+        adapter = new ViewPagerAdapterTabs(getFragmentManager(), titles, titles.length);
 
         // Assigning ViewPager View and setting the adapter
         pager = (ViewPager) findViewById(R.id.pager);
@@ -55,7 +51,7 @@ public class MonumentsActivity extends ActionBarActivity {
 
         // Assiging the Sliding Tab Layout View
         tabs = (SlidingTabLayout) findViewById(R.id.tabs);
-        tabs.setDistributeEvenly(true); // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
+        tabs.setDistributeEvenly(true); // Makes the Tabs Fixed
 
         // TODO Setting Custom Color for the Scroll bar indicator of the Tab View
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
@@ -67,13 +63,8 @@ public class MonumentsActivity extends ActionBarActivity {
 
         // Setting the ViewPager For the SlidingTabsLayout
         tabs.setViewPager(pager);
-
-
         MonumentLoader.loadMonuments(getPreferences(MODE_PRIVATE));
-        if (MonumentList.getList().size() > 0) {
-            currentMonumentId = MonumentList.getList().get(0).getName();
-        }
-
+        switchToListAdapter();
     }
 
     private void toolbarCreation() {
@@ -113,38 +104,27 @@ public class MonumentsActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(visibility);
     }
 
-    public void switchToListAdapter() {//TODO refactor
-        adapter.deleteFragments();
-        //This adapter will be used when a monument is selected
-        adapter.setFragments(new FragmentCityList(), new FragmentMap());
-        adapter.setAdapterList(true);
-        adapter.setTitles(new CharSequence[]{getResources().getString(R.string.tab_monuments), getResources().getString(R.string.tab_map)});
-        tabs.updateTextTitles();
-        pager.setAdapter(adapter);
+    public void switchToListAdapter() {
+        switchToAdapter(new FragmentCityList(), new FragmentMap());
     }
 
-    public void switchToDetailAdapter() { //TODO refactor
+    public void switchToDetailAdapter() {
+        switchToAdapter(new FragmentNotCaptured(), new FragmentMapDetail());
+    }
+
+    private void switchToAdapter(Fragment leftFragment, Fragment rightFragment){
+        Log.i(CLASS, "switchToAdapter: "+leftFragment.getClass().getSimpleName());
+        if(backPressedListener instanceof Fragment) {
+            getFragmentManager().beginTransaction().remove((Fragment) backPressedListener).commit();
+        }
+        tabs.setVisibility(View.VISIBLE);
+        pager.setVisibility(View.VISIBLE);
+        backPressedListener = adapter;
         adapter.deleteFragments();
-        //This adapter will be used when a monument is selected
-        adapter.setFragments(new FragmentNotCaptured(), new FragmentMapDetail());
-        adapter.setAdapterList(false);
+        adapter.setFragments(leftFragment, rightFragment);
         adapter.setTitles(new CharSequence[]{getResources().getString(R.string.tab_monument), getResources().getString(R.string.tab_map)});
         tabs.updateTextTitles();
         pager.setAdapter(adapter);
-    }
-
-    public void switchToFragmentCamera(int currentPicture) {
-        tabs.setVisibility(View.GONE);
-        pager.setVisibility(View.GONE);
-        switchFragment(FragmentCamera.newInstance(currentPicture));
-        fragPlaceholder.setVisibility(View.VISIBLE);
-    }
-
-    private void switchFragment(Fragment fragment) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_placeholder, fragment);
-        ft.addToBackStack("back");
-        ft.commit();
     }
 
     @Override
@@ -174,21 +154,34 @@ public class MonumentsActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        if (!adapter.isAdapterList() && (selectedFragment != null) &&(selectedFragment instanceof FragmentCamera)) {
-            getFragmentManager().beginTransaction().remove(selectedFragment).commit();
-            tabs.setVisibility(View.VISIBLE);
-            pager.setVisibility(View.VISIBLE);
-            fragPlaceholder.setVisibility(View.GONE);
-            setToolBarVisibility(true);
-            selectedFragment= null;
-        } else if (!adapter.isAdapterList()) {
-            switchToListAdapter();
-        } else {
-            super.onBackPressed();
-        }
+        backPressedListener.onBackPressed(this);
     }
 
-    public void setSelectedFragment(Fragment selectedFragment) {
-        this.selectedFragment = selectedFragment;
+    public void startCameraActivity(int currentPicture) {
+        Monument monument = MonumentList.getMonument(currentMonumentId);
+        Intent intent = new Intent(this, CameraActivity.class);
+        intent.putExtra(Assets.CURRENT_PICTURE, currentPicture);
+        intent.putExtra(Assets.MONUMENT_ID, currentMonumentId);
+        intent.putExtra(Assets.PICTURE_RESOURCE, monument.getPhotos()[currentPicture]);
+
+        startActivityForResult(intent, CAMERA_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(CLASS, "result: "+requestCode+"  "+resultCode);
+        if(requestCode == CAMERA_REQUEST_CODE){
+            currentMonumentId = data.getStringExtra(Assets.MONUMENT_ID);
+            if(resultCode == RESULT_OK){
+                Log.i(CLASS, "ok!");
+            }else if(resultCode == RESULT_CANCELED){
+                Log.i(CLASS, "cancelled!");
+            }
+        }
+
+    }
+
+    public interface OnBackPressedListener {
+        public void onBackPressed(MonumentsActivity monumentsActivity);
     }
 }

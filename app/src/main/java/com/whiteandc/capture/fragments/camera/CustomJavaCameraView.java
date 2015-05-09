@@ -22,7 +22,7 @@ import org.opencv.imgproc.Imgproc;
 /**
  * Inspired in the org.opencv.android.CameraBridgeViewBase
  */
-public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallback {
+public class CustomJavaCameraView extends CameraBridgeViewBase implements PreviewCallback {
 
     private static final int MAGIC_TEXTURE_ID = 10;
     private static final String TAG = "JavaCameraView";
@@ -52,11 +52,11 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
         }
     }
 
-    public JavaCameraView(Context context, int cameraId) {
+    public CustomJavaCameraView(Context context, int cameraId) {
         super(context, cameraId);
     }
 
-    public JavaCameraView(Context context, AttributeSet attrs) {
+    public CustomJavaCameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -192,8 +192,10 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                     } else
                         mCamera.setPreviewDisplay(null);
 
-                    setDisplayOrientation(mCamera, 90);
-                    mCamera.setPreviewDisplay(getHolder());
+//                    setDisplayOrientation(mCamera, 90);
+//                    SurfaceHolder holder = getHolder();
+//                    mCamera.setPreviewDisplay(holder);
+
                     /* Finally we are ready to start the preview */
                     Log.d(TAG, "startPreview");
                     mCamera.startPreview();
@@ -349,10 +351,10 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
         @Override
         public void run() {
             do {
-                synchronized (JavaCameraView.this) {
+                synchronized (CustomJavaCameraView.this) {
                     try {
                         while (!mCameraFrameReady && !mStopThread) {
-                            ((Object) JavaCameraView.this).wait();
+                            ((Object) CustomJavaCameraView.this).wait();
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();

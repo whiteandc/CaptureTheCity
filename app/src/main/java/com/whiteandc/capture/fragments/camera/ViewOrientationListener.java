@@ -44,7 +44,6 @@ public class ViewOrientationListener extends OrientationEventListener {
             position = Position.LEFT;
             rotate(position, previousPosition);
         }
-
     }
 
     private void rotate(Position position, Position previousPosition) {
@@ -67,13 +66,13 @@ public class ViewOrientationListener extends OrientationEventListener {
     private int positionToDegrees(Position pos){
         switch (pos){
             case UP:
-                return 0;
-            case RIGHT:
                 return -90;
+            case RIGHT:
+                return -180;
             case DOWN:
-                return 180;
-            case LEFT:
                 return 90;
+            case LEFT:
+                return 0;
             default:
                 return 0;
         }
