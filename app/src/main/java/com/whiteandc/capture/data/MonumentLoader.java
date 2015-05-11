@@ -80,6 +80,7 @@ public class MonumentLoader {
                                                         R.drawable.teleferico3, R.drawable.teleferico4},
                                                         new LatLng(40.425269, -3.717168));
 
+		//addMonument(sharedpreferences, "Test", new int[]{R.drawable.test1,R.drawable.test2});
 	}
 
 	private static void addMonument(SharedPreferences sharedpreferences, String name, int[] photos, LatLng latLng) {
