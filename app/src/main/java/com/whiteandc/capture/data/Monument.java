@@ -11,37 +11,18 @@ public class Monument implements Comparable{
 	private int[] photos= null;
 	private boolean captured= false;
 	private String capturedImg= null;
-<<<<<<< HEAD
 	private String description=  "";
-    private Drawable mainPicture = null;
-
-	public Monument(String name, int[] photoList, boolean captured, String capturedImage, String description){
-=======
-	private String description= "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
-
-    public LatLng getLatLng() {
-        return latLng;
-    }
-
-    public void setLatLng(LatLng latLng) {
-        this.latLng = latLng;
-    }
-
     private LatLng latLng= null;
     private Drawable mainPicture = null;
 
-	public Monument(String name, int[] photoList, boolean captured, String capturedImage, LatLng latLng){
->>>>>>> upstream/master
+	public Monument(String name, int[] photoList, boolean captured, String capturedImage, LatLng latLng, String description){
 		this.name= name;
 		this.photos= photoList;
 		this.captured= captured;
-<<<<<<< HEAD
 		this.capturedImg= capturedImage;
         this.description = description;
-=======
 		capturedImg= capturedImage;
         this.latLng= latLng;
->>>>>>> upstream/master
 	}
 
 	public String getName() {
@@ -80,4 +61,13 @@ public class Monument implements Comparable{
     public String getDescription() {
         return description;
     }
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
+    }
+
 }
