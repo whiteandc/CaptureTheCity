@@ -15,15 +15,19 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+<<<<<<< HEAD
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.ThemeSingleton;
+=======
+
+>>>>>>> upstream/master
 import com.whiteandc.capture.data.Monument;
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
-import com.whiteandc.capture.fragments.FragmentMap;
-import com.whiteandc.capture.fragments.FragmentMapDetail;
+import com.whiteandc.capture.fragments.map.FragmentMap;
+import com.whiteandc.capture.fragments.map.FragmentMapDetail;
 import com.whiteandc.capture.fragments.list.FragmentCityList;
 import com.whiteandc.capture.fragments.notcaptured.CapturedDialog;
 import com.whiteandc.capture.fragments.notcaptured.FragmentNotCaptured;
@@ -70,6 +74,7 @@ public class MonumentsActivity extends ActionBarActivity {
 
         // Setting the ViewPager For the SlidingTabsLayout
         tabs.setViewPager(pager);
+
         MonumentLoader.loadMonuments(getPreferences(MODE_PRIVATE));
         switchToListAdapter();
     }

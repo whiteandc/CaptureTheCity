@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'keyformarket'
+            keyPassword 'linda8noes'
+            storeFile file('C:/Users/Carlos/Dropbox/Compartir/air hockey/keyformarket/keyformarket')
+            storePassword 'linda8noes'
+        }
+    }
     compileSdkVersion 21
     buildToolsVersion "21.1.1"
-
     defaultConfig {
         applicationId "com.whiteandc.capture"
         minSdkVersion 14
@@ -15,6 +22,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
 }
@@ -32,5 +43,9 @@ dependencies {
     compile 'com.getbase:floatingactionbutton:1.7.0'
     compile 'com.commonsware.cwac:camera:0.6.+'
     compile 'com.android.support:support-v13:22.0.0'
+<<<<<<< HEAD
     compile 'com.afollestad:material-dialogs:0.7.3.4'
+=======
+    compile 'com.google.android.gms:play-services:7.3.0'
+>>>>>>> upstream/master
 }
