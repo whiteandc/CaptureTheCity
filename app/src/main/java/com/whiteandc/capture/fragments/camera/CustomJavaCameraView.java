@@ -1,17 +1,22 @@
 package com.whiteandc.capture.fragments.camera;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.CvType;
@@ -139,11 +144,8 @@ public class CustomJavaCameraView extends CameraBridgeViewBase implements Previe
 
                 if (sizes != null) {
                     /* Select the size that fits surface considering maximum size allowed */
-                    Size frameSize = calculateCameraFrameSize(sizes, new JavaCameraSizeAccessor(), width, height);
-
                     params.setPreviewFormat(ImageFormat.NV21);
-                    Log.d(TAG, "Set preview size to " + Integer.valueOf((int)frameSize.width) + "x" + Integer.valueOf((int)frameSize.height));
-                    params.setPreviewSize((int)frameSize.width, (int)frameSize.height);
+                    setBestPreviewSize(params);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
                         params.setRecordingHint(true);
@@ -192,9 +194,7 @@ public class CustomJavaCameraView extends CameraBridgeViewBase implements Previe
                     } else
                         mCamera.setPreviewDisplay(null);
 
-//                    setDisplayOrientation(mCamera, 90);
-//                    SurfaceHolder holder = getHolder();
-//                    mCamera.setPreviewDisplay(holder);
+
 
                     /* Finally we are ready to start the preview */
                     Log.d(TAG, "startPreview");
@@ -370,6 +370,71 @@ public class CustomJavaCameraView extends CameraBridgeViewBase implements Previe
                 }
             } while (!mStopThread);
             Log.d(TAG, "Finish processing thread");
+        }
+    }
+
+
+    public void setBestPreviewSize(Camera.Parameters parameters) {
+        Display display = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        Point displaySize = new Point();
+        display.getSize(displaySize);
+        Camera.Size bestCameraSize = getBestAspectPreviewSize(0, displaySize.x, displaySize.y, parameters, 0.001);
+        parameters.setPreviewSize(bestCameraSize.width, bestCameraSize.height);
+        mCamera.setParameters(parameters);
+    }
+
+    /**
+     * Same algorithm as used in CWAC-Camera library.
+     */
+    private Camera.Size getBestAspectPreviewSize(int displayOrientation,
+                                                 int width,
+                                                 int height,
+                                                 Camera.Parameters parameters,
+                                                 double closeEnough) {
+        double targetRatio=(double)width / height;
+        Camera.Size optimalSize=null;
+        double minDiff=Double.MAX_VALUE;
+
+        if (displayOrientation == 90 || displayOrientation == 270) {
+            targetRatio=(double)height / width;
+        }
+
+        List<Camera.Size> sizes=parameters.getSupportedPreviewSizes();
+
+        Collections.sort(sizes,
+                Collections.reverseOrder(new SizeComparator()));
+
+        for (Camera.Size size : sizes) {
+            double ratio=(double)size.width / size.height;
+
+            if (Math.abs(ratio - targetRatio) < minDiff) {
+                optimalSize=size;
+                minDiff=Math.abs(ratio - targetRatio);
+            }
+
+            if (minDiff < closeEnough) {
+                break;
+            }
+        }
+
+        return(optimalSize);
+    }
+
+    private static class SizeComparator implements
+            Comparator<Camera.Size> {
+        @Override
+        public int compare(Camera.Size lhs, Camera.Size rhs) {
+            int left=lhs.width * lhs.height;
+            int right=rhs.width * rhs.height;
+
+            if (left < right) {
+                return(-1);
+            }
+            else if (left > right) {
+                return(1);
+            }
+
+            return(0);
         }
     }
 }

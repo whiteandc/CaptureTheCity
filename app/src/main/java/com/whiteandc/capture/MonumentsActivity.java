@@ -2,6 +2,7 @@ package com.whiteandc.capture;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -11,14 +12,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
+import com.afollestad.materialdialogs.ThemeSingleton;
 import com.whiteandc.capture.data.Monument;
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
 import com.whiteandc.capture.fragments.FragmentMap;
 import com.whiteandc.capture.fragments.FragmentMapDetail;
 import com.whiteandc.capture.fragments.list.FragmentCityList;
+import com.whiteandc.capture.fragments.notcaptured.CapturedDialog;
 import com.whiteandc.capture.fragments.notcaptured.FragmentNotCaptured;
 import com.whiteandc.capture.tabs.SlidingTabLayout;
 import com.whiteandc.capture.tabs.ViewPagerAdapterTabs;
@@ -174,11 +181,24 @@ public class MonumentsActivity extends ActionBarActivity {
             currentMonumentId = data.getStringExtra(Assets.MONUMENT_ID);
             if(resultCode == RESULT_OK){
                 Log.i(CLASS, "ok!");
+                showCustomWebView();
+                SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+                editor.putString(currentMonumentId, "true");
             }else if(resultCode == RESULT_CANCELED){
                 Log.i(CLASS, "cancelled!");
             }
         }
 
+    }
+
+    private void showCustomWebView() {
+        new MaterialDialog.Builder(this)
+                .theme(Theme.LIGHT)
+                .title(R.string.congratulations)
+                .titleColorRes(R.color.primaryColor)
+                .content(getString(R.string.captured_msg) + " " + currentMonumentId)
+                .positiveText(R.string.ok)
+                .show();
     }
 
     public interface OnBackPressedListener {

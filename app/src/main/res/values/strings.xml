@@ -23,8 +23,12 @@
     <string name="launch_full_screen">Launch Full-Screen</string>
     <string name="mirror_ffc">Mirror FFC</string>
 
+    <string name="congratulations">Congratulations!!</string>
+    <string name="captured_msg">You have captured </string>
+
     <string name="tab_monuments">Monuments</string>
     <string name="tab_monument">Monument</string>
     <string name="tab_map">Map</string>
+    <string name="ok">Ok</string>
 
 </resources>

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import org.opencv.android.OpenCVLoader;
@@ -33,7 +32,6 @@ public class OpenCVUtil {
 
 	private static final float MIN_DIST = 34;
 	private static final float MIN_GOOD_MATCHES = 3;
-	
 	private static String CLASS = "OpenCVUtil"; 
 	static {
 	    if (!OpenCVLoader.initDebug()) {}
@@ -49,35 +47,23 @@ public class OpenCVUtil {
         return resource;
     }
 
-	public static boolean compare2Images(Mat capturedImage, Mat referenceImage, boolean storeResults){
+	public static boolean compare2Images(Mat capturedImage, Mat referenceImage, boolean storeResults, Activity activity){
+        Imgproc.cvtColor(capturedImage, capturedImage, Imgproc.COLOR_RGB2BGR, 4);
 
         // Adjust the orientation
         if(!sameOrientation(capturedImage, referenceImage)){
-            Core.flip(referenceImage.t(), referenceImage, 1); // Rotate 90°
+            Core.flip(capturedImage.t(), capturedImage, 1); // Rotate 90°
         }
 
-        Log.i(CLASS, "Before scale adjust");
-        Log.i(CLASS, "Captured image size: "  + capturedImage.size());
-        Log.i(CLASS, "Reference image size: " + referenceImage.size());
-
-        if(storeResults)
-            storePicture(capturedImage);
         // Adjust the scale
         if(referenceImage.size().width > capturedImage.size().width){
             Size size = calculateSize(capturedImage, referenceImage);
             Imgproc.resize(referenceImage, referenceImage, size);
         }else{
             Size size = calculateSize(referenceImage, capturedImage);
-
             Imgproc.resize(capturedImage, capturedImage, size);
         }
 
-        Log.i(CLASS, "After scale adjust");
-        Log.i(CLASS, "Captured image size: "  + capturedImage.size());
-        Log.i(CLASS, "Reference image size: " + referenceImage.size());
-
-        if(storeResults)
-            storePicture(capturedImage);
 		//Key Points
 		MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
 		MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
@@ -110,49 +96,69 @@ public class OpenCVUtil {
 
         final boolean match = good.size().height >= MIN_GOOD_MATCHES;
         if(match || storeResults) {
-            storeMatchesPicture(capturedImage, referenceImage, keypoints1, keypoints2, good);
+            storeMatchesPicture(capturedImage, referenceImage, keypoints1, keypoints2, good, activity, "match");
         }
 
         return match;
 	}
 
+    /**
+     * Assume same orientation different resolution and mat1 < mat2
+     */
     private static Size calculateSize(Mat mat1, Mat mat2) {
-        double ratio = mat2.size().width / mat2.size().height;
-        return new Size(mat1.size().width, mat1.size().width*ratio);
+        double m1Width = mat1.size().width;
+        double m1Height = mat1.size().height;
+        double m2Width = mat2.size().width;
+        double m2Height = mat2.size().height;
+        Size size = null;
+        boolean landscape = m2Width > m2Height;
+        if(landscape){
+            double ratio = m2Width / m2Height;
+            size = new Size(m1Height*ratio,m1Height);
+        }else{
+            double ratio = m2Height / m2Width;
+            size = new Size(m1Width, m1Width*ratio);
+        }
+        return size;
     }
 
-    private static void storeMatchesPicture(Mat img1, Mat img2,
-			MatOfKeyPoint keypoints1, MatOfKeyPoint keypoints2, MatOfDMatch good) {
+    private static void storeMatchesPicture(Mat img1, Mat img2, MatOfKeyPoint keypoints1,
+                                            MatOfKeyPoint keypoints2, MatOfDMatch good, Activity activity, String fileName) {
 		Mat outImg = new Mat();
 
         Features2d.drawMatches(img1, keypoints1, img2, keypoints2, good, outImg);
 
-        storePicture(outImg);
+        storePicture(outImg, activity, fileName);
 	}
 
-    private static void storePicture(Mat outImg) {
-        Log.i(CLASS, "Storing picture");
+    private static void storePicture(Mat outImg, final Activity activity, String fileName) {
 
-//        File path = Environment.getExternalStoragePublicDirectory(
-//                Environment.DIRECTORY_PICTURES + File.separator + "CaptureTheCity" + File.separator + "Debug");
-//        // Create a media file name
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//
-//        if (! path.exists()){
-//            if (! path.mkdirs()){
-//                Log.i(CLASS, "Required media storage does not exist");
-//            }
-//        }
-//        File file = new File(path,"CAPTURE_"+ timeStamp + ".jpg");
-//
-//        boolean bool = Highgui.imwrite(file.toString(), outImg);
-//        if (bool == true){
-//            Log.i(CLASS, "SUCCESS writing image to external storage");
-//        }else{
-//            Log.i(CLASS, "Fail writing image to external storage");
-//        }
+        File path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES + File.separator + "CaptureTheCity" + File.separator + "Debug");
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
+        if (! path.exists()){
+            if (! path.mkdirs()){
+                Log.i(CLASS, "Required media storage does not exist");
+            }
+        }
+        final File file = new File(path,fileName + "_"+ timeStamp + ".jpg");
 
+        boolean bool = Highgui.imwrite(file.toString(), outImg);
+        if (bool == true){
+            Log.i(CLASS, "SUCCESS writing image to external storage");
+            activity.runOnUiThread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+                        }
+                    }
+            );
+        }else{
+            Log.i(CLASS, "Fail writing image to external storage");
+        }
     }
 
     private static LinkedList<DMatch> getMatchesPercentage(MatOfDMatch matches){

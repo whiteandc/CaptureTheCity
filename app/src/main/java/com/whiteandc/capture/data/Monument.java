@@ -9,16 +9,17 @@ public class Monument implements Comparable{
 	private int[] photos= null;
 	private boolean captured= false;
 	private String capturedImg= null;
-	private String description= "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
-
+	private String description=  "";
     private Drawable mainPicture = null;
 
-	public Monument(String name, int[] photoList, boolean captured, String capturedImage){
+	public Monument(String name, int[] photoList, boolean captured, String capturedImage, String description){
 		this.name= name;
-		photos= photoList;
+		this.photos= photoList;
 		this.captured= captured;
-		capturedImg= capturedImage;
+		this.capturedImg= capturedImage;
+        this.description = description;
 	}
+
 	public String getName() {
 		return name;
 	}
@@ -39,13 +40,10 @@ public class Monument implements Comparable{
 	public void setIsCaptured(boolean b) {
 		captured=b;
 	}
-	public String getDescription() {
-		return description; 
-	}
+
 	public String getCapturedImg() {
 		return capturedImg;
 	}
-
 
     public Drawable getMainPicture() {
         return mainPicture;
@@ -55,4 +53,7 @@ public class Monument implements Comparable{
         this.mainPicture = mainPicture;
     }
 
+    public String getDescription() {
+        return description;
+    }
 }
