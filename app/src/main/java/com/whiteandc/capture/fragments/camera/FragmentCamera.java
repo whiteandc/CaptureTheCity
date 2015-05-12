@@ -37,8 +37,6 @@ public class FragmentCamera extends Fragment implements CameraBridgeViewBase.CvC
     private static final String PICTURE = "PICTURE";
     private static final String CLASS = "FragmentCamera";
 
-    public static volatile Mat currentFrame;
-
     private ImageMatcherThread imageMatcherThread;
 
     private Mat mRgba;
@@ -216,11 +214,6 @@ public class FragmentCamera extends Fragment implements CameraBridgeViewBase.CvC
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
-        if(currentFrame != null) {
-            currentFrame.release();
-            currentFrame = null;
-        }
-        currentFrame = mRgba.clone();
         return mRgba;
     }
 
@@ -252,11 +245,14 @@ public class FragmentCamera extends Fragment implements CameraBridgeViewBase.CvC
 
     @Override
     public Mat getFrame() {
+        Mat currentFrame = null;
+        if(mRgba != null){
+            Log.i(CLASS, "mRgba: "  + mRgba + "size: "+mRgba.size());
+        }
+        if(mRgba != null && mRgba.size().height > 0 && mRgba.size().width > 0){
+            currentFrame = mRgba.clone();
+            Log.i(CLASS, "currentFrame: "  + currentFrame+ "size: "+currentFrame.size());
+        }
         return currentFrame;
-    }
-
-    @Override
-    public void finishActivity(int status) { //TODO We need to redo this (remove casting)
-        ((CameraActivity) getActivity()).finishActivity(status);
     }
 }

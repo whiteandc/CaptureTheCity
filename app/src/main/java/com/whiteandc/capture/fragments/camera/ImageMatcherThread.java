@@ -1,9 +1,12 @@
 package com.whiteandc.capture.fragments.camera;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.whiteandc.capture.CameraActivity;
 import com.whiteandc.capture.opencv.OpenCVUtil;
 
 import org.opencv.core.Mat;
@@ -27,19 +30,23 @@ public class ImageMatcherThread extends Thread{
     public void run(){
         while(!isInterrupted()){
             Mat currentFrame = contract.getFrame();
-            if(currentFrame != null) {
-                Log.i(CLASS, "currentFrame != null. Time: "+System.currentTimeMillis());
-                boolean match = compare(currentFrame, monuments);
-                if (match) {
-                    finishCaptured("Captured");
+            try {
+                if (currentFrame != null) {
+                    boolean match = compare(currentFrame, monuments);
+                    if (match) {
+                        finishCaptured("Captured");
+                    }
+                } else {
+                    // Sleep to avoid overuse of handset's resources
+                    try {
+                        Thread.sleep(100L);
+                    } catch (InterruptedException e) {
+                        Log.e(CLASS, "Error during sleep.", e);
+                    }
                 }
-            }else{
-                Log.i(CLASS, "currentFrame == null.");
-                // Sleep to avoid overuse of handset's resources
-                try {
-                    Thread.sleep(100L);
-                } catch (InterruptedException e) {
-                    Log.e(CLASS, "Error during sleep.", e);
+            }finally {
+                if (currentFrame != null) {
+                    currentFrame.release();
                 }
             }
         }
@@ -50,7 +57,7 @@ public class ImageMatcherThread extends Thread{
                 new Runnable() {
                     @Override
                     public void run() {
-                        contract.finishActivity(Activity.RESULT_OK);
+                        ((CameraActivity) activity).finishActivity(Activity.RESULT_OK);
                     }
                 }
         );
@@ -61,8 +68,8 @@ public class ImageMatcherThread extends Thread{
         int i = 0;
         boolean storeResults = storeResults();
         while(monuments.length > i && !match){
-            Log.i(CLASS, "start compare");
-            match = OpenCVUtil.compare2Images(currentFrame, monuments[i], storeResults);
+            match = OpenCVUtil.compare2Images(currentFrame, monuments[i], storeResults, activity);
+            i++;
         }
         return match;
     }
@@ -70,9 +77,10 @@ public class ImageMatcherThread extends Thread{
     private boolean storeResults() {
         long currentTime = System.currentTimeMillis();
         boolean storeResult = false;
-        if(currentTime - lastExecution > 1000){
+        if(currentTime - lastExecution > 5000){
             storeResult = true;
             lastExecution = currentTime;
+            Log.i(CLASS, "storeResult = " + lastExecution);
         }
 
         Log.i(CLASS, "storeResult = " + storeResult);
@@ -81,6 +89,5 @@ public class ImageMatcherThread extends Thread{
 
     public interface Contract {
         public Mat getFrame();
-        public void finishActivity(int status);
     }
 }

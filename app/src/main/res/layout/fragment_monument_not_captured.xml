@@ -5,44 +5,61 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scrollbars="none">
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/photo_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"/>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="15dp"
+                    android:background="@color/primaryColor"
+                    android:layout_marginTop="285dp">
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/photo_pager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="centerCrop"/>
+                    <com.viewpagerindicator.CirclePageIndicator
+                        android:id="@+id/indicator"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:layout_gravity="center"/>
+                </LinearLayout>
+                <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/camera_fab"
+                    android:layout_width="86dp"
+                    android:layout_height="86dp"
+                    fab:fab_colorNormal="@color/accentColor"
+                    fab:fab_colorPressed="@color/accentColorPressed"
+                    fab:fab_icon="@drawable/ic_action_photo"
+                    fab:fab_size="normal"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="260dp"/>
+            </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="15dp"
-            android:background="@color/primaryColor"
-            android:layout_marginTop="285dp">
-
-            <com.viewpagerindicator.CirclePageIndicator
-                android:id="@+id/indicator"
+            <TextView
+                android:id="@+id/description"
+                android:layout_marginTop="-5dp"
+                android:paddingLeft="25dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="20dp"
+                android:textSize="17sp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:layout_gravity="center"/>
+                android:textColor="@color/background_floating_material_dark"
+                android:text="Esta es una breve descripcion. No tenemos mucha idea de que vamos a poner aqui,pero al menos deberia de ocupar unas cuantas lineas y dejar al usuarion intrigado sobre el monumento. Bueno me estoy quedando din ideas de palabras que poner asi que le voy a decir a Blanca que me diga algo y lo escribo por aqui. Que si te digo algo de que? de algo silencio que diferencia hay entre..."/>
         </LinearLayout>
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/camera_fab"
-            android:layout_width="86dp"
-            android:layout_height="86dp"
-            fab:fab_colorNormal="@color/accentColor"
-            fab:fab_colorPressed="@color/accentColorPressed"
-            fab:fab_icon="@drawable/ic_action_photo"
-            fab:fab_size="normal"
-            android:layout_gravity="right"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="260dp"/>
-    </FrameLayout>
-
-	    
+    </ScrollView>
 
 
 </LinearLayout>

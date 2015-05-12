@@ -30,6 +30,13 @@ public class FragmentNotCaptured extends BasicFragment implements View.OnClickLi
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         Log.i(CLASS, "monumentActivity.getCurrentMonumentId(): "+monumentActivity.getCurrentMonumentId());
+
+        // This is a fail safe method. It shouldn't be necessary
+        if(monumentActivity.getCurrentMonumentId() == null){
+            monumentActivity.setCurrentMonumentId(MonumentList.getList().get(0).getName());
+            monumentActivity.switchToListAdapter();
+            Log.w(CLASS, "Empty current monumentId, this may be due to an error during start activity for result");
+        }
         monument = MonumentList.getMonument(monumentActivity.getCurrentMonumentId());
         View rootView = inflater.inflate(R.layout.fragment_monument_not_captured, container, false);
 
