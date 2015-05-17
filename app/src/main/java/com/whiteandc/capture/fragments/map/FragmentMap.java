@@ -31,7 +31,7 @@ public class FragmentMap extends MapFragment {
 
         addMarkers(googleMap);
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MADRID, 12));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MADRID, 14));
         //googleMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
         return view;
     }
