@@ -18,28 +18,30 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.whiteandc.capture.data.Monument;
 import com.whiteandc.capture.data.MonumentList;
-import com.whiteandc.capture.fragments.list.FragmentCityList;
 import com.whiteandc.capture.fragments.map.FragmentMapDetail;
 import com.whiteandc.capture.fragments.notcaptured.FragmentNotCaptured;
 import com.whiteandc.capture.tabs.SlidingTabLayout;
 import com.whiteandc.capture.tabs.ViewPagerAdapterTabs;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class DetailActivity extends ActionBarActivity {
 
     private static final String CLASS = "DetailActivity";
     private static final int CAMERA_REQUEST_CODE = 10000;
 
-    private Toolbar toolbar;
+    @Bind(R.id.app_bar) Toolbar toolbar;
+    @Bind(R.id.pager) ViewPager pager;
+    @Bind(R.id.tabs) SlidingTabLayout tabs;
     private String currentMonumentId;
-    private ViewPager pager;
     private ViewPagerAdapterTabs adapter;
-    private SlidingTabLayout tabs;
-    private FragmentCityList fragmentCityList;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monuments);
+        ButterKnife.bind(this);
         toolbarCreation();
 
         Bundle b= getIntent().getExtras();
@@ -50,11 +52,9 @@ public class DetailActivity extends ActionBarActivity {
         adapter = new ViewPagerAdapterTabs(getFragmentManager(), titles, titles.length);
 
         // Assigning ViewPager View and setting the adapter
-        pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
 
         // Assiging the Sliding Tab Layout View
-        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
         tabs.setDistributeEvenly(true); // Makes the Tabs Fixed
 
         // TODO Setting Custom Color for the Scroll bar indicator of the Tab View
@@ -73,7 +73,6 @@ public class DetailActivity extends ActionBarActivity {
     }
 
     private void toolbarCreation() {
-        toolbar = (Toolbar) findViewById(R.id.app_bar);
         toolbar.getMenu().clear();
         setSupportActionBar(toolbar);
     }
@@ -181,9 +180,5 @@ public class DetailActivity extends ActionBarActivity {
                 .content(getString(R.string.captured_msg) + " " + currentMonumentId)
                 .positiveText(R.string.ok)
                 .show();
-    }
-
-    public interface OnBackPressedListener {
-        void onBackPressed(DetailActivity detailActivity);
     }
 }

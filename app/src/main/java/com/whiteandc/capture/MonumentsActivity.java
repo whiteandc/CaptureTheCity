@@ -18,26 +18,25 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
-import com.whiteandc.capture.data.Monument;
-import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.data.MonumentLoader;
 import com.whiteandc.capture.fragments.list.FragmentCityList;
 import com.whiteandc.capture.fragments.map.FragmentMap;
-import com.whiteandc.capture.fragments.map.FragmentMapDetail;
-import com.whiteandc.capture.fragments.notcaptured.FragmentNotCaptured;
 import com.whiteandc.capture.tabs.SlidingTabLayout;
 import com.whiteandc.capture.tabs.ViewPagerAdapterTabs;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class MonumentsActivity extends ActionBarActivity {
 
     private static final String CLASS = "MonumentsActivity";
     private static final int CAMERA_REQUEST_CODE = 10000;
 
-    private Toolbar toolbar;
+    @Bind(R.id.app_bar) Toolbar toolbar;
     private String currentMonumentId;
-    private ViewPager pager;
+    @Bind(R.id.pager) ViewPager pager;
     private ViewPagerAdapterTabs adapter;
-    private SlidingTabLayout tabs;
+    @Bind(R.id.tabs) SlidingTabLayout tabs;
     private OnBackPressedListener backPressedListener;
     private FragmentCityList fragmentCityList;
 
@@ -45,6 +44,7 @@ public class MonumentsActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monuments);
+        ButterKnife.bind(this);
         toolbarCreation();
 
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
@@ -52,11 +52,9 @@ public class MonumentsActivity extends ActionBarActivity {
         adapter = new ViewPagerAdapterTabs(getFragmentManager(), titles, titles.length);
 
         // Assigning ViewPager View and setting the adapter
-        pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
 
         // Assiging the Sliding Tab Layout View
-        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
         tabs.setDistributeEvenly(true); // Makes the Tabs Fixed
 
         // TODO Setting Custom Color for the Scroll bar indicator of the Tab View
@@ -75,7 +73,6 @@ public class MonumentsActivity extends ActionBarActivity {
     }
 
     private void toolbarCreation() {
-        toolbar = (Toolbar) findViewById(R.id.app_bar);
         toolbar.getMenu().clear();
         setSupportActionBar(toolbar);
     }
@@ -116,9 +113,6 @@ public class MonumentsActivity extends ActionBarActivity {
         switchToAdapter(fragmentCityList, new FragmentMap());
     }
 
-    public void switchToDetailAdapter() {
-        switchToAdapter(new FragmentNotCaptured(), new FragmentMapDetail());
-    }
 
     private void switchToAdapter(Fragment leftFragment, Fragment rightFragment){
         Log.i(CLASS, "switchToAdapter: "+leftFragment.getClass().getSimpleName());
@@ -156,41 +150,9 @@ public class MonumentsActivity extends ActionBarActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == android.R.id.home) {
-            switchToListAdapter();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void setCurrentMonumentId(String monumentId) {
-        currentMonumentId = monumentId;
-    }
-
-    public String getCurrentMonumentId() {
-        return currentMonumentId;
-    }
-
     @Override
     public void onBackPressed() {
         backPressedListener.onBackPressed(this);
-    }
-
-    public void startCameraActivity(int currentPicture) {
-        Monument monument = MonumentList.getMonument(currentMonumentId);
-        Intent intent = new Intent(this, CameraActivity.class);
-        intent.putExtra(Assets.CURRENT_PICTURE, currentPicture);
-        intent.putExtra(Assets.MONUMENT_ID, currentMonumentId);
-        intent.putExtra(Assets.PICTURE_RESOURCE, monument.getPhotos()[currentPicture]);
-
-        startActivityForResult(intent, CAMERA_REQUEST_CODE);
     }
 
     @Override
