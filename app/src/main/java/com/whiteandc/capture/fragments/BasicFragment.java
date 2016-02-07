@@ -8,16 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.whiteandc.capture.MonumentsActivity;
-
 public abstract class BasicFragment extends Fragment{
 
-    protected MonumentsActivity monumentActivity;
+    protected Activity mActivity;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        monumentActivity = (MonumentsActivity) getActivity();
+        mActivity = getActivity();
     }
 
     @Override
@@ -32,6 +30,7 @@ public abstract class BasicFragment extends Fragment{
     @Override
     public void onDetach() {
         super.onDetach();
-        this.monumentActivity = null;
+        this.mActivity = null;
     }
+
 }

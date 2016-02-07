@@ -32,7 +32,7 @@ build/
 
 
 /*/out
-/*/*/build
+/*/*/build/
 /*/*/production
 *.iws
 *.ipr

@@ -5,16 +5,16 @@ android {
         config {
             keyAlias 'keyformarket'
             keyPassword 'linda8noes'
-            storeFile file('C:/Users/Carlos/Dropbox/Compartir/air hockey/keyformarket/keyformarket')
+            storeFile file('C:/Users/BLANCA/Dropbox/Compartir/air hockey/keyformarket/keyformarket')
             storePassword 'linda8noes'
         }
     }
-    compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
     defaultConfig {
         applicationId "com.whiteandc.capture"
-        minSdkVersion 14
-        targetSdkVersion 21
+        minSdkVersion 21
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -34,15 +34,21 @@ repositories {
     maven {
         url "https://repo.commonsware.com.s3.amazonaws.com"
     }
+    maven {
+        url "https://jitpack.io"
+    }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:appcompat-v7:23.1.0'
     compile project(':libraries:viewPagerIndicator')
     compile project(':libraries:opencv')
     compile 'com.getbase:floatingactionbutton:1.7.0'
     compile 'com.commonsware.cwac:camera:0.6.+'
     compile 'com.android.support:support-v13:22.0.0'
-    compile 'com.afollestad:material-dialogs:0.7.3.4'
-    compile 'com.google.android.gms:play-services:7.3.0'
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.0@aar') {
+        transitive = true
+    }
+    compile 'com.google.android.gms:play-services:8.3.0'
+    compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
 }

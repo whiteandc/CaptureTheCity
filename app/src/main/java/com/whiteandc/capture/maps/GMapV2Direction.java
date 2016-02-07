@@ -1,10 +1,8 @@
 package com.whiteandc.capture.maps;
 
-import java.io.InputStream;
-import java.util.ArrayList;
+import android.util.Log;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -16,10 +14,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.google.android.gms.maps.model.LatLng;
+import java.io.InputStream;
+import java.util.ArrayList;
 
-import android.content.Context;
-import android.util.Log;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class GMapV2Direction {
     public final static String MODE_DRIVING = "driving";
