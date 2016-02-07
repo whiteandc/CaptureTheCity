@@ -1,10 +1,8 @@
 package com.whiteandc.capture.fragments.map;
 
-import android.app.Fragment;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -19,7 +17,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.whiteandc.capture.MonumentsActivity;
+import com.whiteandc.capture.DetailActivity;
 import com.whiteandc.capture.data.Monument;
 import com.whiteandc.capture.data.MonumentList;
 import com.whiteandc.capture.maps.GMapV2Direction;
@@ -38,7 +36,7 @@ public class FragmentMapDetail extends MapFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         GoogleMap map= getMap();
-        String monumentId= ((MonumentsActivity) getActivity()).getCurrentMonumentId();
+        String monumentId= ((DetailActivity) getActivity()).getCurrentMonumentId();
         Monument currentMonument= MonumentList.getMonument(monumentId);
         LatLng latLng= currentMonument.getLatLng();
         Marker marker = map.addMarker(new MarkerOptions().position(latLng)

@@ -11,6 +11,7 @@
 
         <ImageView
             android:id="@+id/item_img"
+            android:transitionName="img_trans"
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:scaleType="centerCrop"/>

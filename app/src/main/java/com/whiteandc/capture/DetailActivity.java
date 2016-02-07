@@ -4,10 +4,8 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -20,17 +18,15 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.whiteandc.capture.data.Monument;
 import com.whiteandc.capture.data.MonumentList;
-import com.whiteandc.capture.data.MonumentLoader;
 import com.whiteandc.capture.fragments.list.FragmentCityList;
-import com.whiteandc.capture.fragments.map.FragmentMap;
 import com.whiteandc.capture.fragments.map.FragmentMapDetail;
 import com.whiteandc.capture.fragments.notcaptured.FragmentNotCaptured;
 import com.whiteandc.capture.tabs.SlidingTabLayout;
 import com.whiteandc.capture.tabs.ViewPagerAdapterTabs;
 
-public class MonumentsActivity extends ActionBarActivity {
+public class DetailActivity extends ActionBarActivity {
 
-    private static final String CLASS = "MonumentsActivity";
+    private static final String CLASS = "DetailActivity";
     private static final int CAMERA_REQUEST_CODE = 10000;
 
     private Toolbar toolbar;
@@ -38,7 +34,6 @@ public class MonumentsActivity extends ActionBarActivity {
     private ViewPager pager;
     private ViewPagerAdapterTabs adapter;
     private SlidingTabLayout tabs;
-    private OnBackPressedListener backPressedListener;
     private FragmentCityList fragmentCityList;
 
     @Override
@@ -47,8 +42,11 @@ public class MonumentsActivity extends ActionBarActivity {
         setContentView(R.layout.activity_monuments);
         toolbarCreation();
 
+        Bundle b= getIntent().getExtras();
+        currentMonumentId= b.getString("monumentId");
+
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        CharSequence[] titles = new CharSequence[]{getResources().getString(R.string.tab_monuments), getResources().getString(R.string.tab_map)};
+        CharSequence[] titles = new CharSequence[]{getResources().getString(R.string.tab_monument), getResources().getString(R.string.tab_map)};
         adapter = new ViewPagerAdapterTabs(getFragmentManager(), titles, titles.length);
 
         // Assigning ViewPager View and setting the adapter
@@ -70,8 +68,8 @@ public class MonumentsActivity extends ActionBarActivity {
         // Setting the ViewPager For the SlidingTabsLayout
         tabs.setViewPager(pager);
 
-        MonumentLoader.loadMonuments(getPreferences(MODE_PRIVATE));
-        switchToListAdapter();
+        //MonumentLoader.loadMonuments(getPreferences(MODE_PRIVATE));
+        switchToAdapter(new FragmentNotCaptured(), new FragmentMapDetail());
     }
 
     private void toolbarCreation() {
@@ -111,23 +109,11 @@ public class MonumentsActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(visibility);
     }
 
-    public void switchToListAdapter() {
-        fragmentCityList= new FragmentCityList();
-        switchToAdapter(fragmentCityList, new FragmentMap());
-    }
-
-    public void switchToDetailAdapter() {
-        switchToAdapter(new FragmentNotCaptured(), new FragmentMapDetail());
-    }
 
     private void switchToAdapter(Fragment leftFragment, Fragment rightFragment){
         Log.i(CLASS, "switchToAdapter: "+leftFragment.getClass().getSimpleName());
-        if(backPressedListener instanceof Fragment) {
-            getFragmentManager().beginTransaction().remove((Fragment) backPressedListener).commit();
-        }
         tabs.setVisibility(View.VISIBLE);
         pager.setVisibility(View.VISIBLE);
-        backPressedListener = adapter;
         adapter.deleteFragments();
         adapter.setFragments(leftFragment, rightFragment);
         adapter.setTitles(new CharSequence[]{getResources().getString(R.string.tab_monument), getResources().getString(R.string.tab_map)});
@@ -137,34 +123,16 @@ public class MonumentsActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.monuments, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                fragmentCityList.searchMonument(query);
-                return true;
-            }
+        getMenuInflater().inflate(R.menu.detail, menu);
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                fragmentCityList.searchMonument(newText);
-                return false;
-            }
-        });
         return super.onCreateOptionsMenu(menu);
     }
-
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == android.R.id.home) {
-            switchToListAdapter();
+           finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -176,11 +144,6 @@ public class MonumentsActivity extends ActionBarActivity {
 
     public String getCurrentMonumentId() {
         return currentMonumentId;
-    }
-
-    @Override
-    public void onBackPressed() {
-        backPressedListener.onBackPressed(this);
     }
 
     public void startCameraActivity(int currentPicture) {
@@ -195,7 +158,7 @@ public class MonumentsActivity extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(CLASS, "result: " + requestCode + "  " + resultCode);
+        Log.i(CLASS, "result: "+requestCode+"  "+resultCode);
         if(requestCode == CAMERA_REQUEST_CODE){
             currentMonumentId = data.getStringExtra(Assets.MONUMENT_ID);
             if(resultCode == RESULT_OK){
@@ -220,9 +183,7 @@ public class MonumentsActivity extends ActionBarActivity {
                 .show();
     }
 
-
-
     public interface OnBackPressedListener {
-        public void onBackPressed(MonumentsActivity monumentsActivity);
+        void onBackPressed(DetailActivity detailActivity);
     }
 }

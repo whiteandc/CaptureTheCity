@@ -1,16 +1,12 @@
 package com.whiteandc.capture.fragments.list;
 
 import android.app.Activity;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,22 +16,40 @@ import com.whiteandc.capture.data.Monument;
 import com.whiteandc.capture.data.MonumentList;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Para Blanca: http://developer.android.com/training/improving-layouts/smooth-scrolling.html
  *  Aqui explica para que se usa el viewHolder y el Asynctask
  *  http://developer.android.com/reference/android/os/AsyncTask.html
  */
-public class CityListAdapter extends ArrayAdapter<Monument> {
+public class CityListAdapter extends BaseAdapter {
 	private final Activity context;
-	private LayoutInflater inflater;
 
-	public CityListAdapter(Activity context) {
-		super(context, R.layout.city_list, MonumentList.getList());
-		this.context = context;
+    private LayoutInflater inflater;
+    private List<Monument> monumentList= MonumentList.getList();
+
+    public CityListAdapter(Activity context) {
+        //super(context, R.layout.city_list, monumentList);
+        this.context = context;
         this.inflater = context.getLayoutInflater();
-	}
-	  
+    }
+
+    @Override
+    public int getCount() {
+        return monumentList.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return monumentList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
 	@Override
 	public View getView(int position, View view, ViewGroup parent) {
         ViewHolder holder;
@@ -53,29 +67,41 @@ public class CityListAdapter extends ArrayAdapter<Monument> {
             holder = (ViewHolder) view.getTag();
         }
         holder.position = position;
-        new ThumbnailTask(position, holder, context)
+        new ThumbnailTask(position, holder, context, monumentList)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
 		return view;
 	}
 
-    private static class ThumbnailTask extends AsyncTask<ViewHolder, Void, Drawable> {
+    public void searchMonument(String query) {
+        monumentList= MonumentList.getList();
+        List<Monument> list= new ArrayList<>(monumentList);
+        for (Monument m : list) {
+            if (!m.getName().toUpperCase().contains(query.toUpperCase())) {
+                monumentList.remove(m);
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    private class ThumbnailTask extends AsyncTask<ViewHolder, Void, Drawable> {
         private int mPosition;
         private ViewHolder mHolder;
         private Activity mContext;
         private Monument mMonument;
+        private List<Monument> mMonuments;
 
-        public ThumbnailTask(int position, ViewHolder holder, Activity context) {
+        public ThumbnailTask(int position, ViewHolder holder, Activity context, List<Monument> monuments) {
             mPosition = position;
             mHolder = holder;
             mContext = context;
+            mMonuments= monuments;
         }
 
         @Override
         //We should download the pictures here
         protected Drawable doInBackground(ViewHolder... params) {
             Drawable image = null;
-            ArrayList<Monument> monuments = MonumentList.getList();
-            mMonument = monuments.get(mPosition);
+            mMonument = mMonuments.get(mPosition);
             if(mMonument.getMainPicture() == null) {
                 image = mContext.getResources().getDrawable(mMonument.getPhotos()[0]);
                 mMonument.setMainPicture(image);
