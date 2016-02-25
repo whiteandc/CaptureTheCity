@@ -52,9 +52,11 @@ public class FragmentMap extends MapFragment {
     }
 
     private void addOneMarker(GoogleMap map, String monument) {
-        LatLng latLng= MonumentList.getMonument(monument).getLatLng();
-        Marker monumentMarker = map.addMarker(new MarkerOptions().position(latLng)
-                .title(monument));
+        if (MonumentList.getMonument(monument) != null) {
+            LatLng latLng = MonumentList.getMonument(monument).getLatLng();
+            map.addMarker(new MarkerOptions().position(latLng)
+                    .title(monument));
+        }
     }
 
 

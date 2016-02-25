@@ -5,12 +5,12 @@ android {
         config {
             keyAlias 'keyformarket'
             keyPassword 'linda8noes'
-            storeFile file('C:/Users/BLANCA/Dropbox/Compartir/air hockey/keyformarket/keyformarket')
+            storeFile file('/Users/crubio/Downloads/keyformarket')
             storePassword 'linda8noes'
         }
     }
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.2"
     defaultConfig {
         applicationId "com.whiteandc.capture"
         minSdkVersion 21
@@ -28,6 +28,10 @@ android {
             signingConfig signingConfigs.config
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
 }
 
 repositories {
@@ -40,17 +44,21 @@ repositories {
 }
 
 dependencies {
+    compile 'com.squareup.okhttp3:okhttp:3.1.2'
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile project(':libraries:viewPagerIndicator')
     compile project(':libraries:opencv')
     compile 'com.getbase:floatingactionbutton:1.7.0'
-    compile 'com.commonsware.cwac:camera:0.6.+'
-    compile 'com.android.support:support-v13:22.0.0'
+    compile 'com.android.support:support-v13:23.1.0'
     compile('com.github.afollestad.material-dialogs:core:0.8.5.0@aar') {
         transitive = true
     }
-    compile 'com.google.android.gms:play-services:8.3.0'
+    compile 'com.google.android.gms:play-services-location:8.3.0'
+    compile 'com.google.android.gms:play-services-analytics:8.3.0'
     compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
     compile 'com.jakewharton:butterknife:7.0.1'
 
+    compile ( [group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.4.1'],
+              [group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.4.1'],
+              [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.1'] )
 }

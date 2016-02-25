@@ -6,6 +6,9 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.whiteandc.capture.R;
+import com.whiteandc.capture.clients.CityManagerClient;
+
+import java.io.IOException;
 
 
 public class MonumentLoader {
@@ -36,7 +39,7 @@ public class MonumentLoader {
 		addMonument(sharedpreferences, "Museo Picasso", new int[]{R.drawable.museo_picasso_entrada, R.drawable.museo_picasso_entrada2, R.drawable.museo_picasso_patio});
 		addMonument(sharedpreferences, "Piramide", new int[]{R.drawable.piramide, R.drawable.piramide_1, R.drawable.piramide_2, R.drawable.piramide_3});
 		addMonument(sharedpreferences, "Teatro romano", new int[]{R.drawable.teatro_romano_alta, R.drawable.teatro_romano_baja, R.drawable.teatro_romano_baja2, R.drawable.teatro_romano_cartel, R.drawable.teatroromano_entrada, R.drawable.teatroromano_entrada_1});
-		addMonument(sharedpreferences, "Test", new int[]{R.drawable.test1,R.drawable.test2});*/
+		addMonument(sharedpreferences, "Test", new int[]{R.drawable.test1,R.drawable.test2});
         addMonument(sharedpreferences, FUENTE_CIBELES, new int[]{R.drawable.cibeles_480},  new LatLng(40.419385, -3.692996), "");
         addMonument(sharedpreferences, PUERTA_ALCALA, new int[]{R.drawable.alcala2},  new LatLng(40.419992, -3.688640), "");
         addMonument(sharedpreferences, CALLE_ALCALA, new int[]{R.drawable.calle_alcala},  new LatLng(40.418659, -3.697051), "");
@@ -78,24 +81,48 @@ public class MonumentLoader {
                                                         new LatLng(40.418450, -3.710599), "");
         addMonument(sharedpreferences, TELEFERICO, new int[]{R.drawable.teleferico, R.drawable.teleferico1,
                                                         R.drawable.teleferico3, R.drawable.teleferico4},
-                                                        new LatLng(40.425269, -3.717168), "");
+                                                        new LatLng(40.425269, -3.717168), "");*/
 
 		//addMonument(sharedpreferences, "Test", new int[]{R.drawable.test1,R.drawable.test2});
-	}
 
-	private static void addMonument(SharedPreferences sharedpreferences, String name, int[] photos, LatLng latLng, String description) {
-		boolean captured= false;
-		if(sharedpreferences.contains(name)){
-			Log.i(CLASS, "Obteniendo valor de key: "+ name);
-			String value= sharedpreferences.getString(name, "0");
-			captured= value.equals("true");
-		}else{
-			Log.i(CLASS, "NO existe "+name+" en SharedPreferences, creando key");
-			Editor editor = sharedpreferences.edit();
-			editor.putString(name, "false");
-			editor.commit(); 
-		}
-		Log.i(CLASS, "Anadiendo a la lista monumento: "+name+ ((captured)?" capturado": " NO capturado"));
-		MonumentList.addItem(new Monument(name, photos,captured,"IMG_20140603_201814.jpg", latLng, description));
+        CityManagerClient cityClient= new CityManagerClient();
+        try {
+            cityClient.getMonuments(sharedpreferences);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
+    public static void addMonument(SharedPreferences sharedpreferences, Monument monument) {
+        boolean captured= false;
+        String name= monument.getName();
+        if(sharedpreferences.contains(name)){
+            Log.i(CLASS, "Obteniendo valor de key: "+ name);
+            String value= sharedpreferences.getString(name, "0");
+            captured= value.equals("true");
+        }else{
+            Log.i(CLASS, "NO existe "+name+" en SharedPreferences, creando key");
+            Editor editor = sharedpreferences.edit();
+            editor.putString(name, "false");
+            editor.commit();
+        }
+        Log.i(CLASS, "Anadiendo a la lista monumento: "+name+ ((captured)?" capturado": " NO capturado"));
+        monument.setCaptured(captured);
+        MonumentList.addItem(monument);
+    }
+//	private static void addMonument(SharedPreferences sharedpreferences, String name, int[] photos, LatLng latLng, String description) {
+//		boolean captured= false;
+//		if(sharedpreferences.contains(name)){
+//			Log.i(CLASS, "Obteniendo valor de key: "+ name);
+//			String value= sharedpreferences.getString(name, "0");
+//			captured= value.equals("true");
+//		}else{
+//			Log.i(CLASS, "NO existe "+name+" en SharedPreferences, creando key");
+//			Editor editor = sharedpreferences.edit();
+//			editor.putString(name, "false");
+//			editor.commit();
+//		}
+//		Log.i(CLASS, "Anadiendo a la lista monumento: "+name+ ((captured)?" capturado": " NO capturado"));
+//		MonumentList.addItem(new Monument(name, photos,captured,"IMG_20140603_201814.jpg", latLng, description));
+//	}
 }

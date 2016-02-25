@@ -42,7 +42,7 @@ public class Monument implements Comparable{
 	public boolean isCaptured() {
 		return captured;
 	}
-	public void setIsCaptured(boolean b) {
+	public void setCaptured(boolean b) {
 		captured=b;
 	}
 

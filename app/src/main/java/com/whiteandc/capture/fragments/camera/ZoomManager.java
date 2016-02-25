@@ -3,7 +3,6 @@ package com.whiteandc.capture.fragments.camera;
 import android.util.Log;
 import android.view.ScaleGestureDetector;
 
-import com.commonsware.cwac.camera.CameraFragment;
 import com.whiteandc.capture.exceptions.CameraParameterNotReadyException;
 
 
